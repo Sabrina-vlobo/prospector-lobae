@@ -72,6 +72,18 @@ npm run dev
 
 Abra http://localhost:3000.
 
+### Controle de gastos
+
+O projeto foi pensado para custar quase nada:
+
+| Variável (`api/.env`) | Padrão | Para quê |
+| --- | --- | --- |
+| `GOOGLE_MONTHLY_CALL_LIMIT` | `200` | Máximo de chamadas pagas ao Google por mês. Depois disso a API recusa com 429. |
+| `GOOGLE_MAX_PAGES_PER_SEARCH` | `3` | Teto de páginas por busca (1 página = 1 chamada = até 20 negócios). |
+| `ANTHROPIC_MODEL` | `claude-haiku-5-5` | O modelo mais barato do Claude, usado na qualificação (Fase 3). |
+
+O contador fica no banco (tabela `ApiUsage`) e aparece na tela. Como segunda proteção, vale também definir um **limite de cota diário** para a Places API e um **alerta de orçamento** direto no Google Cloud Console.
+
 ### Scripts (na raiz)
 
 | Script | O que faz |
@@ -89,7 +101,8 @@ Abra http://localhost:3000.
 | --- | --- | --- |
 | `GET /health` | 0 | ✅ |
 | `GET /leads/stats` | 0 | ✅ |
-| `POST /search` | 1 | ⏳ |
+| `POST /search` | 1 | ✅ |
+| `GET /usage` (cota do Google no mês) | 1 | ✅ |
 | `GET /leads`, `PATCH /leads/:id`, `POST /leads/:id/pagespeed` | 2 | ⏳ |
 | `POST /leads/:id/qualify`, `POST /leads/qualify` | 3 | ⏳ |
 | `POST /leads/:id/contacted` | 4 | ⏳ |
@@ -131,6 +144,15 @@ Na Places API (New), o preço de cada chamada depende dos campos pedidos: a requ
 **Por que validar a saída da IA com zod?**
 Modelo de linguagem não é contrato: mesmo pedindo JSON, a resposta pode vir com campo faltando, nota fora de 0–100 ou texto onde era número. Validar com zod antes de salvar garante que o banco só recebe dado no formato certo e transforma "a IA respondeu algo estranho" num erro claro, em vez de um bug silencioso na tela.
 
+**Por que contar as chamadas ao Google no banco?**
+Um limite só na memória zera toda vez que a API reinicia (e em dev ela reinicia a cada arquivo salvo). No banco, o contador sobrevive. A "reserva" de uma chamada é um único `UPDATE ... WHERE calls < limite`: o próprio Postgres confere e soma no mesmo passo, então nem duas buscas simultâneas furam o limite. A chamada é contada **antes** de ir ao Google; se o Google falhar, ela continua contada (melhor errar para menos).
+
+**Por que o upsert não mexe em status e notas?**
+Buscar "barbearia em Mogi" de novo atualiza só os dados que vêm do Google (telefone, nota, site...). Status do funil, notas e mensagem são trabalho seu e nunca são sobrescritos por uma busca repetida.
+
+**Por que validar também a resposta do Google com zod?**
+Pelo mesmo motivo da IA: é um dado que vem de fora. Se o formato mudar, o erro aparece na hora com uma mensagem clara, em vez de salvar lixo no banco.
+
 **Por que o front chama `/api/*` e o Next repassa (rewrite)?**
 O navegador só enxerga uma origem (`localhost:3000`), então não precisa configurar CORS. E as chaves nunca chegam ao front: o `web` não tem `.env` com segredo nenhum.
 
@@ -152,13 +174,13 @@ O repositório e os prints são públicos. Os leads de demo usam nomes inventado
 npm test
 ```
 
-- **Unitários:** regras puras (ex: montar os contadores por status). Na Fase 1 entra a classificação de `websiteType`; na Fase 4, a normalização de telefone.
-- **Rotas (Supertest):** status HTTP e formato do JSON de cada rota, com o Prisma substituído por um dublê.
+- **Unitários:** regras puras: contadores por status e classificação de `websiteType` (Instagram, Linktree, wa.me... = `social`). Na Fase 4 entra a normalização de telefone.
+- **Rotas (Supertest):** status HTTP e formato do JSON de cada rota, com o Prisma e o Google substituídos por dublês. A busca é testada com paginação, lugares repetidos, limite de páginas, cota esgotada e erro do Google, sem gastar nenhuma chamada.
 
 ## Roteiro
 
 - [x] **Fase 0, Esqueleto:** monorepo, Postgres, schema + migration, `/health`, `/leads/stats`, tela com contadores
-- [ ] **Fase 1, Buscar:** segmento + cidade → Google Places, upsert por `placeId`, classificação do site
+- [x] **Fase 1, Buscar:** segmento + cidade → Google Places, upsert por `placeId`, classificação do site, limite mensal de chamadas
 - [ ] **Fase 2, Filtrar:** tabela com filtros + nota PageSpeed
 - [ ] **Fase 3, Qualificar:** avaliações → Claude → nota, gancho e mensagem (validados com zod)
 - [ ] **Fase 4, Contatar:** mensagem editável + "Abrir no WhatsApp" + follow-up em 3 dias
