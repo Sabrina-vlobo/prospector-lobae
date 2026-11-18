@@ -6,8 +6,8 @@ export const searchRouter = Router();
 
 // O que o front pode mandar. Qualquer coisa fora disso vira 400 (via errorHandler).
 const SearchBodySchema = z.object({
-  segment: z.string().trim().min(2, "Informe o segmento").max(60),
-  city: z.string().trim().min(2, "Informe a cidade").max(60),
+  segment: z.string({ error: "Informe o segmento" }).trim().min(2, "Informe o segmento").max(60),
+  city: z.string({ error: "Informe a cidade" }).trim().min(2, "Informe a cidade").max(60),
   pages: z.coerce.number().int().min(1).max(3).default(1),
 });
 
