@@ -1,0 +1,92 @@
+/* Tokens da marca LOBAE°. Tudo no app usa essas variáveis,
+   nunca o hex solto — assim mudar a marca é mexer num lugar só. */
+:root {
+  --cobalt: #2433ff;
+  --ink: #0b0e2a;
+  --cool-white: #f1f2f6;
+  --signal: #ff5a1f;
+  --mist: #c9cee6;
+
+  --surface: #ffffff;
+  --ink-soft: rgb(11 14 42 / 0.62);
+  --ink-faint: rgb(11 14 42 / 0.4);
+  --line: rgb(11 14 42 / 0.09);
+
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--cool-white);
+  color: var(--ink);
+  font-family: var(--font-text), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+}
+
+/* Etiqueta pixelada (Silkscreen) — só pra textos curtos em caixa alta. */
+.tag {
+  font-family: var(--font-tag), monospace;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.tag--cobalt {
+  color: var(--cobalt);
+}
+
+/* Botão de ação principal: Laranja sinal */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--signal);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 160ms ease-out, filter 160ms ease-out;
+}
+
+.btn:hover {
+  filter: brightness(1.06);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgb(36 51 255 / 0.08);
+  color: var(--cobalt);
+}
