@@ -21,3 +21,31 @@ export type Health = {
   status: "ok" | "degraded";
   db: "up" | "down";
 };
+
+export type WebsiteType = "none" | "social" | "real";
+
+export type SearchInput = {
+  segment: string;
+  city: string;
+  pages: number;
+};
+
+export type SearchSummary = {
+  query: string;
+  pagesFetched: number;
+  found: number;
+  created: number;
+  updated: number;
+  byWebsiteType: Record<WebsiteType, number>;
+  usage: { used: number; limit: number; period: string };
+};
+
+export type Usage = {
+  google: {
+    period: string;
+    used: number;
+    limit: number;
+    maxPagesPerSearch: number;
+    configured: boolean;
+  };
+};
