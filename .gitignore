@@ -18,3 +18,6 @@ next-env.d.ts
 .DS_Store
 Thumbs.db
 *.log
+
+# configurações locais do Claude Code
+.claude/
