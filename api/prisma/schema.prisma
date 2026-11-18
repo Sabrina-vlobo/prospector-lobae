@@ -66,3 +66,17 @@ model Lead {
   @@index([status])
   @@index([nextFollowupAt])
 }
+
+/// Quantas chamadas pagas fizemos a cada API externa, por mês.
+/// Serve de "freio": antes de chamar o Google, conferimos se ainda cabe no limite.
+model ApiUsage {
+  /// ex: "google_places"
+  provider String
+  /// mês no formato "2026-11" (UTC)
+  period   String
+  calls    Int    @default(0)
+
+  updatedAt DateTime @updatedAt
+
+  @@id([provider, period])
+}
