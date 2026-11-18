@@ -1,0 +1,20 @@
+# dependências
+node_modules/
+
+# segredos — só o .env.example vai pro repo
+.env
+.env.*
+!.env.example
+
+# builds e gerados
+.next/
+dist/
+coverage/
+api/src/generated/
+*.tsbuildinfo
+next-env.d.ts
+
+# sistema / editor
+.DS_Store
+Thumbs.db
+*.log
