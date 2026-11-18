@@ -1,7 +1,10 @@
 import express, { type ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
+import { HttpError } from "./lib/errors.js";
 import { healthRouter } from "./routes/health.js";
 import { leadsRouter } from "./routes/leads.js";
+import { searchRouter } from "./routes/search.js";
+import { usageRouter } from "./routes/usage.js";
 
 // Criar o app numa função (sem dar `listen`) deixa o Supertest testar
 // as rotas sem abrir porta nenhuma.
@@ -12,6 +15,8 @@ export function createApp() {
 
   app.use("/health", healthRouter);
   app.use("/leads", leadsRouter);
+  app.use("/search", searchRouter);
+  app.use("/usage", usageRouter);
 
   app.use((_req, res) => {
     res.status(404).json({ error: "Rota não encontrada" });
@@ -22,9 +27,15 @@ export function createApp() {
 }
 
 // Express 5 já encaminha pra cá os erros de handlers async.
+// Todo erro vira { error: "mensagem legível" }, que o front mostra direto na tela.
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ZodError) {
-    res.status(400).json({ error: "Dados inválidos", issues: err.issues });
+    const first = err.issues[0];
+    res.status(400).json({ error: first?.message ?? "Dados inválidos", issues: err.issues });
+    return;
+  }
+  if (err instanceof HttpError) {
+    res.status(err.status).json({ error: err.message, code: err.code });
     return;
   }
   console.error(err);
