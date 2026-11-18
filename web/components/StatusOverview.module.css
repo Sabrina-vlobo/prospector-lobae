@@ -1,0 +1,179 @@
+.overview {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---------- total ---------- */
+.totalNumber {
+  display: block;
+  font-size: clamp(64px, 10vw, 104px);
+  line-height: 0.9;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: var(--cobalt);
+  font-variant-numeric: tabular-nums;
+}
+
+.totalLabel {
+  display: block;
+  margin-top: 8px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* ---------- barra do funil ---------- */
+.funnel {
+  display: flex;
+  gap: 3px;
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.segment {
+  flex-basis: 0;
+  min-width: 6px;
+}
+
+/* ---------- cards ---------- */
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  /* 6 status: 1 coluna no celular, 2 no meio, 3x2 em telas largas */
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 760px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 18px 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.card[data-status="FECHOU"] {
+  border-color: rgb(255 90 31 / 0.35);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgb(11 14 42 / 0.08);
+}
+
+.count {
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.card[data-status="FECHOU"] .count {
+  color: var(--signal);
+}
+
+.cardFoot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.share {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+}
+
+/* ---------- estados: erro / vazio ---------- */
+.notice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 28px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px dashed var(--mist);
+}
+
+.noticeTitle {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.noticeText {
+  margin: 0 0 8px;
+  color: var(--ink-soft);
+  max-width: 56ch;
+}
+
+/* ---------- skeleton ---------- */
+.skeleton {
+  border-radius: var(--radius);
+  background: linear-gradient(
+    90deg,
+    rgb(201 206 230 / 0.35),
+    rgb(201 206 230 / 0.6),
+    rgb(201 206 230 / 0.35)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonTotal {
+  width: 180px;
+  height: 104px;
+}
+
+.skeletonBar {
+  height: 14px;
+  border-radius: 999px;
+}
+
+.skeletonCard {
+  height: 132px;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

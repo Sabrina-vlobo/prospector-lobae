@@ -1,0 +1,27 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--cool-white);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mist);
+}
+
+.pill[data-state="online"] .dot {
+  background: var(--cobalt);
+  box-shadow: 0 0 0 3px rgb(36 51 255 / 0.18);
+}
+
+.pill[data-state="db-down"] .dot,
+.pill[data-state="api-down"] .dot {
+  background: var(--signal);
+  box-shadow: 0 0 0 3px rgb(255 90 31 / 0.2);
+}
