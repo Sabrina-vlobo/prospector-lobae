@@ -1,4 +1,5 @@
 import { ApiStatus } from "@/components/ApiStatus";
+import { SearchForm } from "@/components/SearchForm";
 import { StatusOverview } from "@/components/StatusOverview";
 import styles from "./page.module.css";
 
@@ -20,6 +21,8 @@ export default function HomePage() {
           <span className="tag tag--cobalt">Funil · visão geral</span>
           <h1 className={styles.title}>Quem já entrou no radar e em que pé está cada conversa.</h1>
         </section>
+
+        <SearchForm />
 
         <StatusOverview />
       </main>
