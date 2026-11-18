@@ -1,0 +1,68 @@
+// Schema do LOBAE° Prospector.
+// Toda mudança aqui vira uma migration versionada: `npm run db:migrate -- --name <descricao>`.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  // imports com .js no código gerado, igual ao nosso (padrão do Node ESM)
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Em que ponto do funil o lead está.
+enum LeadStatus {
+  NOVO
+  ENVIADO
+  RESPONDEU
+  REUNIAO
+  FECHOU
+  DESCARTADO
+}
+
+/// O que o "site" do negócio realmente é.
+enum WebsiteType {
+  none   // não tem nada
+  social // só Instagram, Facebook, Linktree, wa.me...
+  real   // site próprio
+}
+
+model Lead {
+  id      String @id @default(cuid())
+  /// ID do lugar no Google Places: é a chave natural pro upsert (não duplicar).
+  placeId String @unique
+
+  name         String
+  category     String?
+  city         String?
+  address      String?
+  phone        String?
+  /// null = sem site
+  website      String?
+  websiteType  WebsiteType @default(none)
+  rating       Float?
+  reviewsCount Int?
+  mapsUrl      String?
+
+  /// Nota de performance mobile da PageSpeed Insights (0-100).
+  pagespeedScore Int?
+
+  status      LeadStatus @default(NOVO)
+  /// Qualificação feita pela IA (0-100).
+  score       Int?
+  scoreReason String?
+  hook        String?
+  message     String?
+  notes       String?
+
+  contactedAt    DateTime?
+  nextFollowupAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([nextFollowupAt])
+}
