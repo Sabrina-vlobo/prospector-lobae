@@ -11,7 +11,7 @@ Muito negócio de bairro (barbearia, doceria, oficina) tem nota alta e centenas 
 O Prospector automatiza a parte chata e deixa a parte humana com quem prospecta:
 
 1. **Busca** negócios por segmento + cidade (Google Places).
-2. **Filtra** quem não tem site ou tem um site ruim (PageSpeed).
+2. **Filtra** e prioriza quem não tem site ou só tem rede social (nota, nº de avaliações, status).
 3. **Qualifica** com IA: lê as avaliações, dá uma nota e escreve uma mensagem específica pra aquele negócio.
 4. **Abre o WhatsApp** com a mensagem pronta. **O envio é manual**, de propósito.
 5. **Acompanha o funil** (kanban, follow-ups, notas).
@@ -29,7 +29,7 @@ flowchart LR
   U([Navegador]) -->|localhost:3000| W["web · Next.js<br/>só front"]
   W -->|"rewrite /api/* → :3333"| A["api · Express + TS<br/>valida com zod"]
   A -->|Prisma| DB[("PostgreSQL<br/>Docker :5434")]
-  A -.->|Fases 1–3| G["Google Places<br/>+ PageSpeed"]
+  A -.->|Fases 1 e 3| G["Google Places"]
   A -.->|Fase 3| C["Claude API"]
   U -.->|"Fase 4: link wa.me<br/>envio manual"| WA["WhatsApp Business"]
 ```
@@ -103,7 +103,8 @@ O contador fica no banco (tabela `ApiUsage`) e aparece na tela. Como segunda pro
 | `GET /leads/stats` | 0 | ✅ |
 | `POST /search` | 1 | ✅ |
 | `GET /usage` (cota do Google no mês) | 1 | ✅ |
-| `GET /leads`, `PATCH /leads/:id`, `POST /leads/:id/pagespeed` | 2 | ⏳ |
+| `GET /leads` (filtros: `websiteType`, `status`, `minRating`, `minReviews`, `q`, `sort`, `page`) | 2 | ✅ |
+| `PATCH /leads/:id` (`status`, `notes`, `message`) | 2 | ✅ |
 | `POST /leads/:id/qualify`, `POST /leads/qualify` | 3 | ⏳ |
 | `POST /leads/:id/contacted` | 4 | ⏳ |
 | `GET /leads/followups/today` | 5 | ⏳ |
@@ -128,8 +129,8 @@ O contador fica no banco (tabela `ApiUsage`) e aparece na tela. Como segunda pro
 │       └── routes/           # health, leads
 └── web/
     ├── next.config.ts        # rewrite /api/* → API
-    ├── app/                  # layout, providers, página inicial
-    ├── components/           # StatusOverview, ApiStatus
+    ├── app/                  # layout (cabeçalho), visão geral (/) e leads (/leads)
+    ├── components/           # AppHeader, SearchForm, StatusOverview, LeadsTable...
     └── lib/                  # cliente HTTP, tipos, metadados de status
 ```
 
@@ -143,6 +144,9 @@ Na Places API (New), o preço de cada chamada depende dos campos pedidos: a requ
 
 **Por que validar a saída da IA com zod?**
 Modelo de linguagem não é contrato: mesmo pedindo JSON, a resposta pode vir com campo faltando, nota fora de 0–100 ou texto onde era número. Validar com zod antes de salvar garante que o banco só recebe dado no formato certo e transforma "a IA respondeu algo estranho" num erro claro, em vez de um bug silencioso na tela.
+
+**Por que os filtros da tabela passam pela API (e não filtram no navegador)?**
+Com centenas de leads, mandar tudo para o navegador e filtrar lá fica pesado. A API valida os filtros com zod, o Postgres filtra, ordena e pagina, e só 25 leads viajam por vez. No front, cada combinação de filtros vira uma chave de cache do TanStack Query, e a busca por nome espera você parar de digitar (debounce) antes de chamar a API.
 
 **Por que contar as chamadas ao Google no banco?**
 Um limite só na memória zera toda vez que a API reinicia (e em dev ela reinicia a cada arquivo salvo). No banco, o contador sobrevive. A "reserva" de uma chamada é um único `UPDATE ... WHERE calls < limite`: o próprio Postgres confere e soma no mesmo passo, então nem duas buscas simultâneas furam o limite. A chamada é contada **antes** de ir ao Google; se o Google falhar, ela continua contada (melhor errar para menos).
@@ -184,7 +188,7 @@ npm test
 
 - [x] **Fase 0, Esqueleto:** monorepo, Postgres, schema + migration, `/health`, `/leads/stats`, tela com contadores
 - [x] **Fase 1, Buscar:** segmento + cidade → Google Places, upsert por `placeId`, classificação do site, limite mensal de chamadas
-- [ ] **Fase 2, Filtrar:** tabela com filtros + nota PageSpeed
+- [x] **Fase 2, Filtrar:** tabela com filtros, ordenação, paginação e troca de status (PageSpeed ficou de fora: o foco é quem não tem site)
 - [ ] **Fase 3, Qualificar:** avaliações → Claude → nota, gancho e mensagem (validados com zod)
 - [ ] **Fase 4, Contatar:** mensagem editável + "Abrir no WhatsApp" + follow-up em 3 dias
 - [ ] **Fase 5, Funil:** kanban, follow-ups do dia, notas
