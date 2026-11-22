@@ -80,7 +80,10 @@ O projeto foi pensado para custar quase nada:
 | --- | --- | --- |
 | `GOOGLE_MONTHLY_CALL_LIMIT` | `200` | Máximo de chamadas pagas ao Google por mês. Depois disso a API recusa com 429. |
 | `GOOGLE_MAX_PAGES_PER_SEARCH` | `3` | Teto de páginas por busca (1 página = 1 chamada = até 20 negócios). |
-| `ANTHROPIC_MODEL` | `claude-haiku-5-5` | O modelo mais barato do Claude, usado na qualificação (Fase 3). |
+| `GOOGLE_DETAILS_MONTHLY_LIMIT` | `100` | Máximo de buscas de avaliações (Place Details) por mês. É outro tipo de chamada, com cota grátis própria. |
+| `ANTHROPIC_MODEL` | `claude-haiku-5-5` | O modelo mais barato do Claude, usado na qualificação. Troque por `claude-sonnet-5-5` se quiser mensagens melhores. |
+| `ANTHROPIC_MONTHLY_CALL_LIMIT` | `300` | Máximo de qualificações com IA por mês. |
+| `QUALIFY_BATCH_MAX` | `10` | Máximo de leads por "Qualificar selecionados". |
 
 O contador fica no banco (tabela `ApiUsage`) e aparece na tela. Como segunda proteção, vale também definir um **limite de cota diário** para a Places API e um **alerta de orçamento** direto no Google Cloud Console.
 
@@ -102,10 +105,10 @@ O contador fica no banco (tabela `ApiUsage`) e aparece na tela. Como segunda pro
 | `GET /health` | 0 | ✅ |
 | `GET /leads/stats` | 0 | ✅ |
 | `POST /search` | 1 | ✅ |
-| `GET /usage` (cota do Google no mês) | 1 | ✅ |
+| `GET /usage` (uso das cotas no mês: busca, avaliações e IA) | 1 | ✅ |
 | `GET /leads` (filtros: `websiteType`, `status`, `minRating`, `minReviews`, `q`, `sort`, `page`) | 2 | ✅ |
 | `PATCH /leads/:id` (`status`, `notes`, `message`) | 2 | ✅ |
-| `POST /leads/:id/qualify`, `POST /leads/qualify` | 3 | ⏳ |
+| `POST /leads/:id/qualify`, `POST /leads/qualify` (lote, `{ ids }`) | 3 | ✅ |
 | `POST /leads/:id/contacted` | 4 | ⏳ |
 | `GET /leads/followups/today` | 5 | ⏳ |
 
@@ -145,6 +148,14 @@ Na Places API (New), o preço de cada chamada depende dos campos pedidos: a requ
 **Por que validar a saída da IA com zod?**
 Modelo de linguagem não é contrato: mesmo pedindo JSON, a resposta pode vir com campo faltando, nota fora de 0–100 ou texto onde era número. Validar com zod antes de salvar garante que o banco só recebe dado no formato certo e transforma "a IA respondeu algo estranho" num erro claro, em vez de um bug silencioso na tela.
 
+Na prática são três camadas: (1) **structured outputs** da API do Claude (`messages.parse` + `zodOutputFormat`), que obriga o modelo a responder no formato JSON do schema; (2) o mesmo **schema zod** conferindo a resposta antes do `update` no banco (nota inteira de 0 a 100, textos com tamanho mínimo e máximo); (3) regras que não podem depender da IA "lembrar", como a **assinatura e a linha de saída** da mensagem, são garantidas em código (`ensureSignatureAndOptOut`).
+
+**Como o prompt trata as avaliações?**
+As avaliações são texto escrito por terceiros, então vão dentro de tags (`<avaliacoes>`), com `<` e `>` removidos para ninguém "fechar" a tag, e o system prompt manda tratar qualquer instrução lá dentro como texto comum (proteção contra *prompt injection*). O nome de quem escreveu a avaliação **não** é enviado à IA: ela não precisa disso.
+
+**Por que o Haiku com esforço baixo?**
+Qualificar um negócio é uma tarefa curta e bem definida. O modelo mais barato (`claude-haiku-5-5`) com `effort: "low"` custa uma fração de centavo por lead. O modelo fica no `.env` (`ANTHROPIC_MODEL`) para trocar sem mexer no código. Antes de chamar a IA, a API confere se a chave existe: sem chave, nenhuma cota é gasta.
+
 **Por que os filtros da tabela passam pela API (e não filtram no navegador)?**
 Com centenas de leads, mandar tudo para o navegador e filtrar lá fica pesado. A API valida os filtros com zod, o Postgres filtra, ordena e pagina, e só 25 leads viajam por vez. No front, cada combinação de filtros vira uma chave de cache do TanStack Query, e a busca por nome espera você parar de digitar (debounce) antes de chamar a API.
 
@@ -182,13 +193,13 @@ npm test
 ```
 
 - **Unitários:** regras puras: contadores por status e classificação de `websiteType` (Instagram, Linktree, wa.me... = `social`). Na Fase 4 entra a normalização de telefone.
-- **Rotas (Supertest):** status HTTP e formato do JSON de cada rota, com o Prisma e o Google substituídos por dublês. A busca é testada com paginação, lugares repetidos, limite de páginas, cota esgotada e erro do Google, sem gastar nenhuma chamada.
+- **Rotas (Supertest):** status HTTP e formato do JSON de cada rota, com o Prisma e o Google substituídos por dublês. A busca é testada com paginação, lugares repetidos, limite de páginas, cota esgotada e erro do Google; a qualificação, com resposta inválida da IA, cota esgotada, chave faltando e lote com falha parcial. Nada disso gasta chamada de verdade.
 
 ## Roteiro
 
 - [x] **Fase 0, Esqueleto:** monorepo, Postgres, schema + migration, `/health`, `/leads/stats`, tela com contadores
 - [x] **Fase 1, Buscar:** segmento + cidade → Google Places, upsert por `placeId`, classificação do site, limite mensal de chamadas
 - [x] **Fase 2, Filtrar:** tabela com filtros, ordenação, paginação e troca de status (PageSpeed ficou de fora: o foco é quem não tem site)
-- [ ] **Fase 3, Qualificar:** avaliações → Claude → nota, gancho e mensagem (validados com zod)
+- [x] **Fase 3, Qualificar:** avaliações → Claude (Haiku) → nota, gancho e mensagem, validados com zod; individual ou em lote, com cota mensal
 - [ ] **Fase 4, Contatar:** mensagem editável + "Abrir no WhatsApp" + follow-up em 3 dias
 - [ ] **Fase 5, Funil:** kanban, follow-ups do dia, notas
