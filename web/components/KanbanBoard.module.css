@@ -1,0 +1,175 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 6 colunas lado a lado; em tela menor, rola na horizontal dentro do quadro */
+.board {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 1fr);
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 320px;
+  padding: 12px;
+  border-radius: var(--radius);
+  background: rgb(201 206 230 / 0.28);
+  border: 2px dashed transparent;
+  transition: background 150ms ease-out, border-color 150ms ease-out;
+}
+
+/* Destaque da coluna enquanto um card está sendo arrastado por cima */
+.column[data-over] {
+  border-color: var(--cobalt);
+  background: rgb(36 51 255 / 0.07);
+}
+
+.columnHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgb(11 14 42 / 0.08);
+}
+
+.count {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgb(11 14 42 / 0.04);
+  cursor: grab;
+  transition: box-shadow 150ms ease-out, opacity 150ms ease-out;
+}
+
+.card:hover {
+  box-shadow: 0 4px 14px rgb(11 14 42 / 0.08);
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+/* O card "fantasma" que ficou no lugar enquanto você arrasta */
+.card[data-dragging] {
+  opacity: 0.4;
+}
+
+.cardName {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cardName:hover {
+  color: var(--cobalt);
+}
+
+.cardName:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.noSite {
+  color: #b33a0c;
+  font-weight: 600;
+}
+
+.chip,
+.chipDue,
+.chipMuted {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.chip {
+  background: rgb(36 51 255 / 0.08);
+  color: var(--cobalt);
+}
+
+.chipDue {
+  background: var(--signal);
+  color: #fff;
+  font-weight: 600;
+}
+
+.chipMuted {
+  background: var(--cool-white);
+  color: var(--ink-faint);
+}
+
+.empty {
+  padding: 18px 8px;
+  border-radius: 10px;
+  border: 1px dashed var(--mist);
+  font-size: 13px;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+.more {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+.error {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: rgb(255 90 31 / 0.1);
+  color: #b33a0c;
+  font-size: 14px;
+}
