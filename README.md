@@ -12,15 +12,15 @@ O Prospector automatiza a parte chata e deixa a parte humana com quem prospecta:
 
 1. **Busca** negócios por segmento + cidade (Google Places).
 2. **Filtra** e prioriza quem não tem site ou só tem rede social (nota, nº de avaliações, status).
-3. **Qualifica** com IA: lê as avaliações, dá uma nota e escreve uma mensagem específica pra aquele negócio.
-4. **Abre o WhatsApp** com a mensagem pronta. **O envio é manual**, de propósito.
+3. **Monta a mensagem** com os dados do Google, em 3 modelos editáveis (custo zero). Opcional: **qualificar com IA**, que lê as avaliações, dá uma nota e escreve uma mensagem sob medida.
+4. **Abre o WhatsApp** com a mensagem pronta e agenda o follow-up. **O envio é manual**, de propósito.
 5. **Acompanha o funil** (kanban, follow-ups, notas).
 
 ## Demo
 
 ![Tela inicial com contadores do funil (dados fictícios)](docs/fase-0-home.jpg)
 
-_Todos os dados nos prints são fictícios (seed). O GIF do fluxo completo entra quando a Fase 4 estiver pronta._
+_Todos os dados nos prints são fictícios (seed). O GIF do fluxo completo entra na Fase 5._
 
 ## Arquitetura
 
@@ -45,7 +45,7 @@ flowchart LR
 | Front | Next.js 16, React 19, TypeScript, TanStack Query, CSS Modules, `next/font` (Host Grotesk + Silkscreen) |
 | API | Node 22, Express 5, TypeScript, zod, Prisma 7 (driver adapter `pg`) |
 | Banco | PostgreSQL 17 (docker-compose) |
-| Testes | Vitest + Supertest |
+| Testes | Vitest (API e web) + Supertest |
 | Monorepo | npm workspaces + concurrently |
 
 ## Como rodar
@@ -109,7 +109,7 @@ O contador fica no banco (tabela `ApiUsage`) e aparece na tela. Como segunda pro
 | `GET /leads` (filtros: `websiteType`, `status`, `minRating`, `minReviews`, `q`, `sort`, `page`) | 2 | ✅ |
 | `PATCH /leads/:id` (`status`, `notes`, `message`) | 2 | ✅ |
 | `POST /leads/:id/qualify`, `POST /leads/qualify` (lote, `{ ids }`) | 3 | ✅ |
-| `POST /leads/:id/contacted` | 4 | ⏳ |
+| `POST /leads/:id/contacted` (`{ message? }` → ENVIADO, `contactedAt`, follow-up +3 dias) | 4 | ✅ |
 | `GET /leads/followups/today` | 5 | ⏳ |
 
 ## Estrutura
@@ -153,6 +153,12 @@ Na prática são três camadas: (1) **structured outputs** da API do Claude (`me
 **Como o prompt trata as avaliações?**
 As avaliações são texto escrito por terceiros, então vão dentro de tags (`<avaliacoes>`), com `<` e `>` removidos para ninguém "fechar" a tag, e o system prompt manda tratar qualquer instrução lá dentro como texto comum (proteção contra *prompt injection*). O nome de quem escreveu a avaliação **não** é enviado à IA: ela não precisa disso.
 
+**Por que mensagens por modelo, sem IA, por padrão?**
+O objetivo era custo zero. Os dados que já vêm do Google (nome, nota, nº de avaliações, se tem site ou só Instagram, segmento e cidade) bastam para uma mensagem específica e honesta. São 3 modelos (Direta, Elogio + pergunta, Curta), funções puras em `web/lib/messageTemplates.ts`, com testes. Você escolhe um, edita à vontade e envia. A IA continua no projeto como opção: sem `ANTHROPIC_API_KEY`, a tela esconde tudo que depende dela.
+
+**Por que "Abrir no WhatsApp" é um link (`<a>`) e não `window.open`?**
+Navegadores bloqueiam janelas abertas por código depois de uma requisição assíncrona. Um link de verdade, clicado pela pessoa, nunca é bloqueado. O mesmo clique dispara o `POST /leads/:id/contacted` em paralelo, que marca o lead como ENVIADO e agenda o follow-up. O telefone é normalizado para o formato `55 + DDD + número` (`web/lib/phone.ts`), e números que não parecem válidos desativam o botão em vez de abrir uma conversa errada.
+
 **Por que o Haiku com esforço baixo?**
 Qualificar um negócio é uma tarefa curta e bem definida. O modelo mais barato (`claude-haiku-5-5`) com `effort: "low"` custa uma fração de centavo por lead. O modelo fica no `.env` (`ANTHROPIC_MODEL`) para trocar sem mexer no código. Antes de chamar a IA, a API confere se a chave existe: sem chave, nenhuma cota é gasta.
 
@@ -192,7 +198,7 @@ O repositório e os prints são públicos. Os leads de demo usam nomes inventado
 npm test
 ```
 
-- **Unitários:** regras puras: contadores por status e classificação de `websiteType` (Instagram, Linktree, wa.me... = `social`). Na Fase 4 entra a normalização de telefone.
+- **Unitários:** regras puras: contadores por status e classificação de `websiteType` (Instagram, Linktree, wa.me... = `social`). No front (Vitest no `web`): normalização de telefone brasileiro para o `wa.me` e os 3 modelos de mensagem.
 - **Rotas (Supertest):** status HTTP e formato do JSON de cada rota, com o Prisma e o Google substituídos por dublês. A busca é testada com paginação, lugares repetidos, limite de páginas, cota esgotada e erro do Google; a qualificação, com resposta inválida da IA, cota esgotada, chave faltando e lote com falha parcial. Nada disso gasta chamada de verdade.
 
 ## Roteiro
@@ -200,6 +206,6 @@ npm test
 - [x] **Fase 0, Esqueleto:** monorepo, Postgres, schema + migration, `/health`, `/leads/stats`, tela com contadores
 - [x] **Fase 1, Buscar:** segmento + cidade → Google Places, upsert por `placeId`, classificação do site, limite mensal de chamadas
 - [x] **Fase 2, Filtrar:** tabela com filtros, ordenação, paginação e troca de status (PageSpeed ficou de fora: o foco é quem não tem site)
-- [x] **Fase 3, Qualificar:** avaliações → Claude (Haiku) → nota, gancho e mensagem, validados com zod; individual ou em lote, com cota mensal
-- [ ] **Fase 4, Contatar:** mensagem editável + "Abrir no WhatsApp" + follow-up em 3 dias
+- [x] **Fase 3, Qualificar (opcional):** avaliações → Claude (Haiku) → nota, gancho e mensagem, validados com zod; individual ou em lote, com cota mensal
+- [x] **Fase 4, Contatar:** 3 modelos de mensagem editáveis (sem IA), "Abrir no WhatsApp" com telefone normalizado, ENVIADO + follow-up em 3 dias
 - [ ] **Fase 5, Funil:** kanban, follow-ups do dia, notas
