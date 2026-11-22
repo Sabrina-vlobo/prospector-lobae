@@ -42,14 +42,12 @@ export type SearchSummary = {
   usage: { used: number; limit: number; period: string };
 };
 
+type Quota = { period: string; used: number; limit: number };
+
 export type Usage = {
-  google: {
-    period: string;
-    used: number;
-    limit: number;
-    maxPagesPerSearch: number;
-    configured: boolean;
-  };
+  google: Quota & { maxPagesPerSearch: number; configured: boolean };
+  googleDetails: Quota;
+  anthropic: Quota & { model: string; batchMax: number; configured: boolean };
 };
 
 // Um lead como a API devolve (datas chegam como texto ISO no JSON).
@@ -78,7 +76,7 @@ export type Lead = {
   updatedAt: string;
 };
 
-export type LeadSort = "reviews" | "rating" | "name" | "recent";
+export type LeadSort = "reviews" | "rating" | "score" | "name" | "recent";
 
 export type LeadFilters = {
   q: string;
@@ -95,4 +93,10 @@ export type LeadsPage = {
   total: number;
   page: number;
   pageSize: number;
+};
+
+export type QualifyBatchResponse = {
+  results: Array<{ id: string; ok: true; lead: Lead } | { id: string; ok: false; error: string; code?: string }>;
+  succeeded: number;
+  failed: number;
 };
