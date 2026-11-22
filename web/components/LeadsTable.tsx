@@ -2,7 +2,8 @@
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { apiGet, apiPatch, apiPost } from "@/lib/api";
+import { apiGet, apiPost } from "@/lib/api";
+import { changeLeadStatus } from "@/lib/leadActions";
 import { STATUS_META } from "@/lib/status";
 import {
   LEAD_STATUSES,
@@ -101,8 +102,7 @@ export function LeadsTable() {
   }
 
   const updateStatus = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: LeadStatus }) =>
-      apiPatch<Lead>(`/leads/${id}`, { status }),
+    mutationFn: ({ lead, status }: { lead: Lead; status: LeadStatus }) => changeLeadStatus(lead, status),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["leads"] }),
   });
 
@@ -380,12 +380,12 @@ export function LeadsTable() {
                   aiEnabled={aiEnabled}
                   selected={selected.has(lead.id)}
                   expanded={expanded.has(lead.id)}
-                  savingStatus={updateStatus.isPending && updateStatus.variables?.id === lead.id}
+                  savingStatus={updateStatus.isPending && updateStatus.variables?.lead.id === lead.id}
                   qualifying={qualifying.has(lead.id)}
                   qualifyError={rowErrors[lead.id]}
                   onToggleSelect={() => setSelected((s) => toggleInSet(s, lead.id))}
                   onToggleExpand={() => setExpanded((s) => toggleInSet(s, lead.id))}
-                  onStatusChange={(status) => updateStatus.mutate({ id: lead.id, status })}
+                  onStatusChange={(status) => updateStatus.mutate({ lead, status })}
                   onQualify={() => qualifyOne.mutate(lead.id)}
                 />
               ))}

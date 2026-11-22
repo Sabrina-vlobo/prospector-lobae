@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { apiPost } from "@/lib/api";
+import { shortDate } from "@/lib/dates";
 import {
   buildFollowupOptions,
   buildMessageOptions,
@@ -12,10 +13,6 @@ import {
 import { normalizeBrazilPhone, whatsappLink } from "@/lib/phone";
 import type { Lead } from "@/lib/types";
 import styles from "./MessageComposer.module.css";
-
-/** "25/11" */
-const shortDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
 
 // O compositor muda de "modo" conforme o status do lead:
 // - first:     NOVO → modelos de primeiro contato; o clique marca ENVIADO + follow-up

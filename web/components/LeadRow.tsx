@@ -195,7 +195,7 @@ function ScoreBadge({ score }: { score: number | null }) {
 }
 
 /** "Sem site" / "instagram.com" / "example.com": de onde é a presença online do negócio. */
-function WebsiteBadge({ lead }: { lead: Lead }) {
+export function WebsiteBadge({ lead }: { lead: Lead }) {
   if (lead.websiteType === "none" || !lead.website) {
     return <span className={`${styles.badge} ${styles.badgeNone}`}>Sem site</span>;
   }
