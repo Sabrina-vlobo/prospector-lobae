@@ -6,7 +6,13 @@ import { prisma } from "../lib/prisma.js";
 import { GOOGLE_PLACES, getUsage, reserveCall } from "../lib/quota.js";
 import { classifyWebsite } from "../lib/website.js";
 
-export type SearchInput = { segment: string; city: string; pages: number };
+export type SearchInput = {
+  segment: string;
+  city: string;
+  pages: number;
+  /** true = não salva quem já tem site próprio (foco em "sem site" e "só rede social") */
+  skipRealSites: boolean;
+};
 
 export type SearchSummary = {
   query: string;
@@ -14,11 +20,18 @@ export type SearchSummary = {
   found: number;
   created: number;
   updated: number;
+  /** encontrados mas não salvos (tinham site próprio) */
+  skipped: number;
   byWebsiteType: Record<WebsiteType, number>;
   usage: { used: number; limit: number; period: string };
 };
 
-export async function runSearch({ segment, city, pages }: SearchInput): Promise<SearchSummary> {
+export async function runSearch({
+  segment,
+  city,
+  pages,
+  skipRealSites,
+}: SearchInput): Promise<SearchSummary> {
   const apiKey = env.GOOGLE_PLACES_API_KEY;
   if (!apiKey) {
     throw new HttpError(
@@ -44,21 +57,28 @@ export async function runSearch({ segment, city, pages }: SearchInput): Promise<
     pageToken = page.nextPageToken;
   } while (pageToken && pagesFetched < maxPages);
 
-  // 2) Quais já existiam? (só pra contar "novos" x "atualizados")
-  const ids = [...places.keys()];
+  // 2) Classifica todos e separa quem vai pro banco.
+  //    O Google cobra a chamada igual, então filtramos DEPOIS, antes de salvar.
+  const byWebsiteType: Record<WebsiteType, number> = { none: 0, social: 0, real: 0 };
+  const toSave: Array<{ place: Place; websiteType: WebsiteType }> = [];
+
+  for (const place of places.values()) {
+    const websiteType = classifyWebsite(place.websiteUri);
+    byWebsiteType[websiteType]++;
+    if (skipRealSites && websiteType === "real") continue;
+    toSave.push({ place, websiteType });
+  }
+
+  // 3) Quais já existiam? (só pra contar "novos" x "atualizados")
+  const ids = toSave.map(({ place }) => place.id);
   const existing = await prisma.lead.findMany({
     where: { placeId: { in: ids } },
     select: { placeId: true },
   });
   const existingIds = new Set(existing.map((lead) => lead.placeId));
 
-  // 3) Upsert por placeId: cria se não existe, atualiza se já existe. Nunca duplica.
-  const byWebsiteType: Record<WebsiteType, number> = { none: 0, social: 0, real: 0 };
-
-  for (const place of places.values()) {
-    const websiteType = classifyWebsite(place.websiteUri);
-    byWebsiteType[websiteType]++;
-
+  // 4) Upsert por placeId: cria se não existe, atualiza se já existe. Nunca duplica.
+  for (const { place, websiteType } of toSave) {
     // Só os dados que vêm do Google. Status, notas, mensagem etc. são SEUS:
     // uma busca repetida nunca apaga o que você já trabalhou no lead.
     const googleData = {
@@ -87,6 +107,7 @@ export async function runSearch({ segment, city, pages }: SearchInput): Promise<
     found: places.size,
     created: ids.filter((id) => !existingIds.has(id)).length,
     updated: ids.filter((id) => existingIds.has(id)).length,
+    skipped: places.size - toSave.length,
     byWebsiteType,
     usage: { used: usage.used, limit: usage.limit, period: usage.period },
   };

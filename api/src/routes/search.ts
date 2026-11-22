@@ -9,6 +9,8 @@ const SearchBodySchema = z.object({
   segment: z.string({ error: "Informe o segmento" }).trim().min(2, "Informe o segmento").max(60),
   city: z.string({ error: "Informe a cidade" }).trim().min(2, "Informe a cidade").max(60),
   pages: z.coerce.number().int().min(1).max(3).default(1),
+  // Padrão: foco em quem NÃO tem site próprio (sem site ou só rede social).
+  skipRealSites: z.boolean().default(true),
 });
 
 // POST /search: busca no Google e salva os leads.

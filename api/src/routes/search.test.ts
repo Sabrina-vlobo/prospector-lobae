@@ -56,7 +56,7 @@ describe("POST /search", () => {
 
     const res = await request(app)
       .post("/search")
-      .send({ segment: "barbearia", city: "Cidade Exemplo", pages: 3 });
+      .send({ segment: "barbearia", city: "Cidade Exemplo", pages: 3, skipRealSites: false });
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({
@@ -65,6 +65,7 @@ describe("POST /search", () => {
       found: 3,
       created: 2,
       updated: 1,
+      skipped: 0,
       byWebsiteType: { none: 1, social: 1, real: 1 },
       usage: { used: 2, limit: 200 },
     });
@@ -77,6 +78,32 @@ describe("POST /search", () => {
 
     // 1 upsert por lugar único
     expect(prisma.lead.upsert).toHaveBeenCalledTimes(3);
+  });
+
+  it("por padrão, não salva quem já tem site próprio (mas conta no resumo)", async () => {
+    googleReplies({ places: [placeA, placeB, placeC] }); // A sem site, B Instagram, C site real
+
+    const res = await request(app).post("/search").send({ segment: "barbearia", city: "Cidade Exemplo" });
+
+    expect(res.body).toMatchObject({
+      found: 3,
+      created: 2,
+      skipped: 1,
+      byWebsiteType: { none: 1, social: 1, real: 1 },
+    });
+    const savedIds = vi.mocked(prisma.lead.upsert).mock.calls.map(([args]) => args.where.placeId);
+    expect(savedIds).toEqual(["pA", "pB"]);
+  });
+
+  it("salva quem tem site quando skipRealSites é false", async () => {
+    googleReplies({ places: [placeC] });
+
+    const res = await request(app)
+      .post("/search")
+      .send({ segment: "barbearia", city: "Cidade Exemplo", skipRealSites: false });
+
+    expect(res.body).toMatchObject({ created: 1, skipped: 0 });
+    expect(prisma.lead.upsert).toHaveBeenCalledTimes(1);
   });
 
   it("nunca sobrescreve status ou notas numa busca repetida", async () => {
