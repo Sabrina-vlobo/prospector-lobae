@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Host_Grotesk, Silkscreen } from "next/font/google";
+import { AppHeader } from "@/components/AppHeader";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -27,7 +28,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={`${hostGrotesk.variable} ${silkscreen.variable}`}>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="app-shell">
+            <AppHeader />
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );

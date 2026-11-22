@@ -40,6 +40,13 @@ button {
   font: inherit;
 }
 
+/* Casca do app: cabeçalho em cima, página embaixo ocupando o resto */
+.app-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
 /* Etiqueta pixelada (Silkscreen) — só pra textos curtos em caixa alta. */
 .tag {
   font-family: var(--font-tag), monospace;
@@ -89,4 +96,17 @@ code {
   border-radius: 6px;
   background: rgb(36 51 255 / 0.08);
   color: var(--cobalt);
+}
+
+/* Some da tela, mas leitores de tela continuam lendo (acessibilidade). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }

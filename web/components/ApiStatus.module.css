@@ -8,6 +8,25 @@
   background: var(--cool-white);
 }
 
+.pill :global(.tag) {
+  white-space: nowrap;
+}
+
+/* No celular fica só a bolinha; o texto some da tela mas o leitor de tela ainda lê */
+@media (max-width: 560px) {
+  .pill {
+    padding: 9px;
+  }
+  .pill :global(.tag) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
 .dot {
   width: 8px;
   height: 8px;
