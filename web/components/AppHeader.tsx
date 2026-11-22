@@ -3,17 +3,22 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ApiStatus } from "./ApiStatus";
+import { useFollowupsToday } from "./FollowupsToday";
 import styles from "./AppHeader.module.css";
 
 const NAV = [
   { href: "/", label: "Visão geral" },
   { href: "/leads", label: "Leads" },
+  { href: "/funil", label: "Funil" },
 ];
 
 // Fica no layout, então aparece em todas as páginas.
 // É "use client" porque o usePathname (qual página está aberta) só existe no navegador.
 export function AppHeader() {
   const pathname = usePathname();
+  // contador de follow-ups pendentes no item "Funil" (mesmo cache da página do funil)
+  const followups = useFollowupsToday();
+  const pending = followups.data?.total ?? 0;
 
   return (
     <header className={styles.topbar}>
@@ -34,6 +39,11 @@ export function AppHeader() {
                 aria-current={active ? "page" : undefined}
               >
                 {item.label}
+                {item.href === "/funil" && pending > 0 && (
+                  <span className={styles.badge} aria-label={`${pending} follow-ups pendentes`}>
+                    {pending}
+                  </span>
+                )}
               </Link>
             );
           })}

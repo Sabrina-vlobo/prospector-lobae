@@ -24,3 +24,8 @@
   font-weight: 700;
   text-wrap: balance;
 }
+
+/* Páginas que precisam de mais largura (o kanban tem 6 colunas) */
+.wide {
+  max-width: 1440px;
+}

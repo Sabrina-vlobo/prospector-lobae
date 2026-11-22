@@ -76,3 +76,25 @@
     padding: 7px 10px;
   }
 }
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Bolinha laranja com o nº de follow-ups pendentes */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--signal);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
