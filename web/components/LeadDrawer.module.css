@@ -1,0 +1,151 @@
+/* O <dialog> vira um painel encostado na direita da tela */
+.drawer {
+  margin: 0 0 0 auto;
+  width: min(520px, 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding: 0;
+  border: 0;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: -12px 0 40px rgb(11 14 42 / 0.18);
+}
+
+/* Fundo escurecido atrás do painel */
+.drawer::backdrop {
+  background: rgb(11 14 42 / 0.35);
+}
+
+/* Entrada: desliza da direita (respeitando quem prefere menos movimento) */
+.drawer[open] {
+  animation: slide-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(32px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer[open] {
+    animation: none;
+  }
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.close {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--mist);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 2px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 24px 40px;
+  overflow-y: auto;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating {
+  font-size: 14px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.statusField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.statusSelect {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--mist);
+  border-radius: var(--radius-sm);
+  background: var(--cool-white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+.contact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.link {
+  font-size: 13px;
+  color: var(--cobalt);
+  text-decoration: none;
+}
+
+.section {
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.error {
+  margin: 24px;
+  color: #b33a0c;
+}
