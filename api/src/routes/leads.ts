@@ -84,3 +84,36 @@ leadsRouter.post("/:id/qualify", async (req, res) => {
   const lead = await qualifyLead(req.params.id);
   res.json(lead);
 });
+
+// POST /leads/:id/contacted: você clicou em "Abrir no WhatsApp".
+// Marca como ENVIADO, guarda quando foi e agenda o follow-up pra daqui a 3 dias.
+// (O envio em si é manual, no seu WhatsApp Business: a API nunca manda mensagem.)
+export const FOLLOWUP_DAYS = 3;
+
+const ContactedSchema = z
+  .object({
+    // o texto que você escolheu/editou, pra ficar registrado no lead
+    message: z.string().trim().min(1).max(2000).optional(),
+  })
+  .strict();
+
+leadsRouter.post("/:id/contacted", async (req, res) => {
+  const { message } = ContactedSchema.parse(req.body ?? {});
+
+  const exists = await prisma.lead.findUnique({ where: { id: req.params.id }, select: { id: true } });
+  if (!exists) throw new HttpError(404, "Lead não encontrado", "LEAD_NOT_FOUND");
+
+  const now = new Date();
+  const followup = new Date(now.getTime() + FOLLOWUP_DAYS * 24 * 60 * 60 * 1000);
+
+  const lead = await prisma.lead.update({
+    where: { id: req.params.id },
+    data: {
+      status: "ENVIADO",
+      contactedAt: now,
+      nextFollowupAt: followup,
+      ...(message ? { message } : {}),
+    },
+  });
+  res.json(lead);
+});
