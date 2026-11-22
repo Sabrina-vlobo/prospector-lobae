@@ -8,6 +8,7 @@ node_modules/
 
 # builds e gerados
 .next/
+.next-demo/
 dist/
 coverage/
 api/src/generated/
@@ -21,3 +22,6 @@ Thumbs.db
 
 # configurações locais do Claude Code
 .claude/
+
+# gerado automaticamente pelo next dev (instruções para assistentes de IA)
+web/AGENTS.md

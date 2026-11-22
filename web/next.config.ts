@@ -6,6 +6,9 @@ import type { NextConfig } from "next";
 const API_URL = process.env.API_URL ?? "http://localhost:3333";
 
 const nextConfig: NextConfig = {
+  // Pasta de build configurável: permite rodar uma 2ª instância (ex: a de demo,
+  // com outro banco) ao mesmo tempo que o npm run dev normal, sem uma brigar com a outra.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${API_URL}/:path*` }];
   },
