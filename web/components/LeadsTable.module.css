@@ -530,3 +530,42 @@ a.badge:hover {
   background: rgb(36 51 255 / 0.06);
   font-size: 14px;
 }
+
+/* =========================================================
+   Fase 4: contatar
+   ========================================================= */
+
+/* Botão principal da linha: abre o compositor de mensagem */
+.contactButton {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 150ms ease-out;
+}
+
+.contactButton:hover {
+  opacity: 0.85;
+}
+
+.contactButton[aria-expanded="true"] {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.contactButton:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 2px;
+}
+
+.detailsSub {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--ink-faint);
+}

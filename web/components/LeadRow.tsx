@@ -2,10 +2,13 @@
 
 import { STATUS_META } from "@/lib/status";
 import { LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/types";
+import { MessageComposer } from "./MessageComposer";
 import styles from "./LeadsTable.module.css";
 
 type Props = {
   lead: Lead;
+  /** IA configurada? Sem ela, somem: seleção, score e botão Qualificar. */
+  aiEnabled: boolean;
   selected: boolean;
   expanded: boolean;
   savingStatus: boolean;
@@ -17,10 +20,12 @@ type Props = {
   onQualify: () => void;
 };
 
-export const COLUMN_COUNT = 7;
+/** Quantas colunas a tabela tem (a linha de detalhes ocupa todas). */
+export const columnCount = (aiEnabled: boolean) => (aiEnabled ? 7 : 5);
 
 export function LeadRow({
   lead,
+  aiEnabled,
   selected,
   expanded,
   savingStatus,
@@ -32,18 +37,21 @@ export function LeadRow({
   onQualify,
 }: Props) {
   const detailsId = `lead-details-${lead.id}`;
+  const colSpan = columnCount(aiEnabled);
 
   return (
     <>
       <tr className={selected ? styles.rowSelected : undefined}>
-        <td className={styles.checkCell}>
-          <input
-            type="checkbox"
-            checked={selected}
-            onChange={onToggleSelect}
-            aria-label={`Selecionar ${lead.name}`}
-          />
-        </td>
+        {aiEnabled && (
+          <td className={styles.checkCell}>
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={onToggleSelect}
+              aria-label={`Selecionar ${lead.name}`}
+            />
+          </td>
+        )}
         <td>
           <div className={styles.name}>{lead.name}</div>
           {lead.address && <div className={styles.address}>{lead.address}</div>}
@@ -61,9 +69,11 @@ export function LeadRow({
             <span className={styles.muted}>—</span>
           )}
         </td>
-        <td className={styles.num}>
-          <ScoreBadge score={lead.score} />
-        </td>
+        {aiEnabled && (
+          <td className={styles.num}>
+            <ScoreBadge score={lead.score} />
+          </td>
+        )}
         <td>
           <select
             className={styles.statusSelect}
@@ -82,23 +92,24 @@ export function LeadRow({
         </td>
         <td>
           <div className={styles.actions}>
+            {aiEnabled && (
+              <button
+                type="button"
+                className={styles.qualifyButton}
+                onClick={onQualify}
+                disabled={qualifying}
+              >
+                {qualifying ? "Qualificando…" : lead.score != null ? "Requalificar" : "Qualificar"}
+              </button>
+            )}
             <button
               type="button"
-              className={styles.qualifyButton}
-              onClick={onQualify}
-              disabled={qualifying}
-            >
-              {qualifying ? "Qualificando…" : lead.score != null ? "Requalificar" : "Qualificar"}
-            </button>
-            <button
-              type="button"
-              className={styles.expandButton}
+              className={styles.contactButton}
               onClick={onToggleExpand}
               aria-expanded={expanded}
               aria-controls={detailsId}
-              aria-label={expanded ? "Fechar detalhes" : "Ver detalhes"}
             >
-              {expanded ? "▴" : "▾"}
+              {expanded ? "Fechar ▴" : "Contatar ▾"}
             </button>
           </div>
         </td>
@@ -106,7 +117,7 @@ export function LeadRow({
 
       {qualifyError && (
         <tr className={styles.errorRow}>
-          <td colSpan={COLUMN_COUNT} role="alert">
+          <td colSpan={colSpan} role="alert">
             {qualifyError}
           </td>
         </tr>
@@ -114,7 +125,7 @@ export function LeadRow({
 
       {expanded && (
         <tr className={styles.detailsRow} id={detailsId}>
-          <td colSpan={COLUMN_COUNT}>
+          <td colSpan={colSpan}>
             <LeadDetails lead={lead} />
           </td>
         </tr>
@@ -127,42 +138,43 @@ function LeadDetails({ lead }: { lead: Lead }) {
   return (
     <div className={styles.details}>
       <div className={styles.detailsCol}>
-        {lead.score == null ? (
-          <p className={styles.muted}>
-            Ainda não qualificado. Clique em <strong>Qualificar</strong> para a IA ler as avaliações e sugerir
-            uma mensagem.
-          </p>
-        ) : (
-          <>
-            <div>
-              <span className="tag tag--cobalt">Gancho</span>
-              <p className={styles.detailsText}>{lead.hook}</p>
-            </div>
-            <div>
-              <span className="tag">Por que essa nota</span>
-              <p className={styles.detailsText}>{lead.scoreReason}</p>
-            </div>
-          </>
-        )}
+        <div>
+          <span className="tag">Contato</span>
+          <p className={styles.detailsText}>{lead.phone ?? "Sem telefone no Google"}</p>
+          {lead.address && <p className={styles.detailsSub}>{lead.address}</p>}
+        </div>
 
         <div className={styles.contactLine}>
-          <span>{lead.phone ?? "sem telefone"}</span>
           {lead.mapsUrl && (
             <a className={styles.mapsLink} href={lead.mapsUrl} target="_blank" rel="noreferrer">
               Ver no Maps ↗
             </a>
           )}
+          {lead.website && (
+            <a className={styles.mapsLink} href={lead.website} target="_blank" rel="noreferrer">
+              Ver rede/site ↗
+            </a>
+          )}
         </div>
+
+        {/* Só aparece se o lead foi qualificado pela IA em algum momento */}
+        {lead.hook && (
+          <div>
+            <span className="tag tag--cobalt">Gancho (IA)</span>
+            <p className={styles.detailsText}>{lead.hook}</p>
+          </div>
+        )}
+        {lead.scoreReason && (
+          <div>
+            <span className="tag">Por que essa nota (IA)</span>
+            <p className={styles.detailsText}>{lead.scoreReason}</p>
+          </div>
+        )}
       </div>
 
-      {lead.message && (
-        <div className={styles.detailsCol}>
-          <span className="tag">Mensagem sugerida</span>
-          {/* white-space: pre-wrap respeita as quebras de linha que a IA escreveu */}
-          <p className={styles.messageBubble}>{lead.message}</p>
-          <span className={styles.muted}>Editar e abrir no WhatsApp chega na Fase 4.</span>
-        </div>
-      )}
+      <div className={styles.detailsCol}>
+        <MessageComposer lead={lead} />
+      </div>
     </div>
   );
 }

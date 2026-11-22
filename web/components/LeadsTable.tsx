@@ -91,6 +91,8 @@ export function LeadsTable() {
 
   const usageQuery = useQuery({ queryKey: ["usage"], queryFn: () => apiGet<Usage>("/usage") });
   const ai = usageQuery.data?.anthropic;
+  // Sem chave da IA, a tela esconde tudo que depende dela (o app continua 100% usável).
+  const aiEnabled = Boolean(ai?.configured);
 
   /** Depois de mudar leads: recarrega a lista, os contadores e o uso das cotas. */
   function refreshAfterChange() {
@@ -261,7 +263,7 @@ export function LeadsTable() {
             value={filters.sort}
             onChange={(e) => update("sort", e.target.value as LeadSort)}
           >
-            {SORT_OPTIONS.map((o) => (
+            {SORT_OPTIONS.filter((o) => aiEnabled || o.value !== "score").map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
@@ -270,15 +272,7 @@ export function LeadsTable() {
         </label>
       </div>
 
-      {/* ---------- aviso: falta chave da IA ---------- */}
-      {ai && !ai.configured && (
-        <p className={styles.warning}>
-          Para qualificar com IA, coloque a <code>ANTHROPIC_API_KEY</code> no <code>api/.env</code> e reinicie o{" "}
-          <code>npm run dev</code>.
-        </p>
-      )}
-
-      {/* ---------- resumo + ações em lote ---------- */}
+            {/* ---------- resumo + ações em lote ---------- */}
       <div className={styles.summary}>
         <span>
           {data ? (
@@ -289,7 +283,7 @@ export function LeadsTable() {
             "Carregando…"
           )}
           {leadsQuery.isFetching && data && <span className={styles.updating}> · atualizando</span>}
-          {ai && (
+          {aiEnabled && ai && (
             <span className={styles.aiUsage}>
               {" "}
               · IA este mês: {ai.used} de {ai.limit}
@@ -303,7 +297,7 @@ export function LeadsTable() {
         )}
       </div>
 
-      {selected.size > 0 && (
+      {aiEnabled && selected.size > 0 && (
         <div className={styles.bulkBar} role="region" aria-label="Ações com os selecionados">
           <span>
             <strong>{selected.size}</strong> {selected.size === 1 ? "selecionado" : "selecionados"}
@@ -316,7 +310,7 @@ export function LeadsTable() {
             <button
               type="button"
               className="btn"
-              disabled={tooMany || qualifyBatch.isPending || !ai?.configured}
+              disabled={tooMany || qualifyBatch.isPending}
               onClick={() => qualifyBatch.mutate([...selected])}
             >
               {qualifyBatch.isPending ? `Qualificando ${selected.size}…` : "Qualificar selecionados"}
@@ -351,23 +345,27 @@ export function LeadsTable() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th scope="col" className={styles.checkCell}>
-                  <input
-                    ref={selectAllRef}
-                    type="checkbox"
-                    checked={allOnPageSelected}
-                    onChange={toggleAllOnPage}
-                    aria-label="Selecionar todos desta página"
-                  />
-                </th>
+                {aiEnabled && (
+                  <th scope="col" className={styles.checkCell}>
+                    <input
+                      ref={selectAllRef}
+                      type="checkbox"
+                      checked={allOnPageSelected}
+                      onChange={toggleAllOnPage}
+                      aria-label="Selecionar todos desta página"
+                    />
+                  </th>
+                )}
                 <th scope="col">Negócio</th>
                 <th scope="col">Site</th>
                 <th scope="col" className={styles.num}>
                   Nota
                 </th>
-                <th scope="col" className={styles.num}>
-                  Score
-                </th>
+                {aiEnabled && (
+                  <th scope="col" className={styles.num}>
+                    Score
+                  </th>
+                )}
                 <th scope="col">Status</th>
                 <th scope="col">
                   <span className="visually-hidden">Ações</span>
@@ -379,6 +377,7 @@ export function LeadsTable() {
                 <LeadRow
                   key={lead.id}
                   lead={lead}
+                  aiEnabled={aiEnabled}
                   selected={selected.has(lead.id)}
                   expanded={expanded.has(lead.id)}
                   savingStatus={updateStatus.isPending && updateStatus.variables?.id === lead.id}
