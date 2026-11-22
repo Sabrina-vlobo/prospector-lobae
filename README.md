@@ -20,7 +20,7 @@ O Prospector automatiza a parte chata e deixa a parte humana com quem prospecta:
 
 ![Tela inicial com contadores do funil (dados fictícios)](docs/fase-0-home.jpg)
 
-_Todos os dados nos prints são fictícios (seed). O GIF do fluxo completo entra na Fase 5._
+_Todos os dados nos prints são fictícios (seed). GIF do fluxo completo: em breve._
 
 ## Arquitetura
 
@@ -110,7 +110,8 @@ O contador fica no banco (tabela `ApiUsage`) e aparece na tela. Como segunda pro
 | `PATCH /leads/:id` (`status`, `notes`, `message`) | 2 | ✅ |
 | `POST /leads/:id/qualify`, `POST /leads/qualify` (lote, `{ ids }`) | 3 | ✅ |
 | `POST /leads/:id/contacted` (`{ message? }` → ENVIADO, `contactedAt`, follow-up +3 dias) | 4 | ✅ |
-| `GET /leads/followups/today` | 5 | ⏳ |
+| `GET /leads/followups/today` (ENVIADO com follow-up até hoje, atrasados primeiro) | 5 | ✅ |
+| `GET /leads/:id` | 5 | ✅ |
 
 ## Estrutura
 
@@ -159,6 +160,18 @@ O objetivo era custo zero. Os dados que já vêm do Google (nome, nota, nº de a
 **Por que "Abrir no WhatsApp" é um link (`<a>`) e não `window.open`?**
 Navegadores bloqueiam janelas abertas por código depois de uma requisição assíncrona. Um link de verdade, clicado pela pessoa, nunca é bloqueado. O mesmo clique dispara o `POST /leads/:id/contacted` em paralelo, que marca o lead como ENVIADO e agenda o follow-up. O telefone é normalizado para o formato `55 + DDD + número` (`web/lib/phone.ts`), e números que não parecem válidos desativam o botão em vez de abrir uma conversa errada.
 
+**Por que o primeiro contato não oferece demo?**
+Mandar "um exemplo de como ficaria" para cada negócio dá trabalho antes de saber se existe interesse. As mensagens terminam com uma pergunta aberta ("Ter um site é algo que faz sentido pra vocês hoje?") e quem demonstra interesse puxa a conversa. Um teste garante que nenhum modelo de primeiro contato fala em exemplo, demo ou ideia pronta.
+
+**Como funciona o follow-up?**
+O compositor muda conforme o status: **Novo** mostra os modelos de primeiro contato; **Enviado** mostra 3 follow-ups (Lembrete leve, Pergunta direta e Último contato) e a mensagem anterior; a partir de **Respondeu** vira texto livre e o botão só abre a conversa, sem mexer no status. Cada envio agenda o próximo lembrete em 3 dias, menos o "Último contato" (`scheduleFollowup: false`). Sair de Enviado (respondeu, reunião, fechou, descartado) cancela o lembrete, regra aplicada na API. Marcar Enviado "na mão" (arrastando no kanban) registra o contato e agenda o follow-up, como se a mensagem tivesse saído pelo botão.
+
+**Por que o kanban usa atualização otimista?**
+Ao soltar um card, ele muda de coluna **na hora**: o cache do TanStack Query é atualizado antes da resposta da API (`onMutate`), guardando uma "foto" das duas colunas. Se a API falhar, a foto é restaurada (`onError`) e o card volta. No fim, tudo é revalidado com o servidor (`onSettled`). O arrastar usa a API nativa do HTML (`draggable`, `dragover`, `drop`), sem biblioteca. Como drag and drop não é acessível por teclado nem funciona bem no celular, o nome do card é um botão que abre o painel lateral, onde dá para trocar o status por um `<select>`.
+
+**Por que o painel lateral é um `<dialog>`?**
+O `<dialog>` nativo com `showModal()` já prende o foco dentro do painel, escurece o fundo (`::backdrop`) e fecha com Esc. É acessibilidade que vem de graça, sem biblioteca de modal.
+
 **Por que o Haiku com esforço baixo?**
 Qualificar um negócio é uma tarefa curta e bem definida. O modelo mais barato (`claude-haiku-5-5`) com `effort: "low"` custa uma fração de centavo por lead. O modelo fica no `.env` (`ANTHROPIC_MODEL`) para trocar sem mexer no código. Antes de chamar a IA, a API confere se a chave existe: sem chave, nenhuma cota é gasta.
 
@@ -198,7 +211,7 @@ O repositório e os prints são públicos. Os leads de demo usam nomes inventado
 npm test
 ```
 
-- **Unitários:** regras puras: contadores por status e classificação de `websiteType` (Instagram, Linktree, wa.me... = `social`). No front (Vitest no `web`): normalização de telefone brasileiro para o `wa.me` e os 3 modelos de mensagem.
+- **Unitários:** regras puras: contadores por status e classificação de `websiteType` (Instagram, Linktree, wa.me... = `social`). No front (Vitest no `web`): normalização de telefone brasileiro para o `wa.me`, modelos de primeiro contato e de follow-up (incluindo a regra "sem demo") e as datas de follow-up ("atrasado há 2 dias").
 - **Rotas (Supertest):** status HTTP e formato do JSON de cada rota, com o Prisma e o Google substituídos por dublês. A busca é testada com paginação, lugares repetidos, limite de páginas, cota esgotada e erro do Google; a qualificação, com resposta inválida da IA, cota esgotada, chave faltando e lote com falha parcial. Nada disso gasta chamada de verdade.
 
 ## Roteiro
@@ -208,4 +221,4 @@ npm test
 - [x] **Fase 2, Filtrar:** tabela com filtros, ordenação, paginação e troca de status (PageSpeed ficou de fora: o foco é quem não tem site)
 - [x] **Fase 3, Qualificar (opcional):** avaliações → Claude (Haiku) → nota, gancho e mensagem, validados com zod; individual ou em lote, com cota mensal
 - [x] **Fase 4, Contatar:** 3 modelos de mensagem editáveis (sem IA), "Abrir no WhatsApp" com telefone normalizado, ENVIADO + follow-up em 3 dias
-- [ ] **Fase 5, Funil:** kanban, follow-ups do dia, notas
+- [x] **Fase 5, Funil:** kanban com arrastar e soltar (atualização otimista), follow-ups de hoje com contador no menu, mensagens de follow-up, notas por lead e painel lateral
