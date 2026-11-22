@@ -20,7 +20,7 @@ const csvEnum = <T extends string>(values: readonly [T, ...T[]]) =>
 const websiteTypes = Object.values(WebsiteType) as [WebsiteType, ...WebsiteType[]];
 const statuses = Object.values(LeadStatus) as [LeadStatus, ...LeadStatus[]];
 
-export const SORTS = ["reviews", "rating", "name", "recent"] as const;
+export const SORTS = ["reviews", "rating", "score", "name", "recent"] as const;
 
 export const LeadQuerySchema = z.object({
   q: z.string().trim().max(80).optional(),
@@ -53,6 +53,9 @@ export function buildLeadOrderBy(sort: LeadQuery["sort"]): Prisma.LeadOrderByWit
   switch (sort) {
     case "rating":
       return [{ rating: { sort: "desc", nulls: "last" } }, { reviewsCount: { sort: "desc", nulls: "last" } }];
+    case "score":
+      // os ainda não qualificados (score null) vão pro fim
+      return [{ score: { sort: "desc", nulls: "last" } }, { reviewsCount: { sort: "desc", nulls: "last" } }];
     case "name":
       return [{ name: "asc" }];
     case "recent":

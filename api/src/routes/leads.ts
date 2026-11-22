@@ -5,6 +5,8 @@ import { HttpError } from "../lib/errors.js";
 import { LeadQuerySchema, buildLeadOrderBy, buildLeadWhere } from "../lib/leadFilters.js";
 import { prisma } from "../lib/prisma.js";
 import { buildLeadStats } from "../lib/stats.js";
+import { env } from "../env.js";
+import { qualifyLead, qualifyMany } from "../services/qualify.js";
 
 export const leadsRouter = Router();
 
@@ -55,5 +57,30 @@ leadsRouter.patch("/:id", async (req, res) => {
   if (!exists) throw new HttpError(404, "Lead não encontrado", "LEAD_NOT_FOUND");
 
   const lead = await prisma.lead.update({ where: { id: req.params.id }, data });
+  res.json(lead);
+});
+
+// POST /leads/qualify: qualifica vários de uma vez (os selecionados na tabela).
+const QualifyBatchSchema = z.object({
+  ids: z
+    .array(z.string().min(1))
+    .min(1, "Selecione pelo menos um lead")
+    .max(env.QUALIFY_BATCH_MAX, `No máximo ${env.QUALIFY_BATCH_MAX} leads por vez`),
+});
+
+leadsRouter.post("/qualify", async (req, res) => {
+  const { ids } = QualifyBatchSchema.parse(req.body);
+  const unique = [...new Set(ids)];
+  const results = await qualifyMany(unique);
+  res.json({
+    results,
+    succeeded: results.filter((r) => r.ok).length,
+    failed: results.filter((r) => !r.ok).length,
+  });
+});
+
+// POST /leads/:id/qualify: avaliações do Google → Claude → nota, gancho e mensagem.
+leadsRouter.post("/:id/qualify", async (req, res) => {
+  const lead = await qualifyLead(req.params.id);
   res.json(lead);
 });
