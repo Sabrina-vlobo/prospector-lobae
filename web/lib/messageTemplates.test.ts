@@ -82,8 +82,8 @@ describe("regra: primeiro contato sem oferecer demo", () => {
     ["só Instagram", { ...base, websiteType: "social" as const, website: "https://instagram.com/x" }],
   ])("nenhum modelo oferece exemplo, demo ou ideia pronta (%s)", (_label, lead) => {
     for (const option of buildMessageOptions(lead)) {
-      // tira o nome do negócio ("Barbearia Exemplo") antes de procurar as palavras proibidas
-      const withoutName = option.text.replaceAll(lead.name, "");
+      // tira o nome do negócio e a cidade de teste (os dois têm "Exemplo") antes de procurar
+      const withoutName = option.text.replaceAll(lead.name, "").replaceAll(lead.city, "");
       expect(withoutName).not.toMatch(/exemplo|demo|ideia de como|te mostrar|te mandar/i);
     }
   });
