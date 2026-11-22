@@ -40,6 +40,56 @@ const TextSearchResponseSchema = z.object({
 export type Place = z.infer<typeof PlaceSchema>;
 export type TextSearchPage = z.infer<typeof TextSearchResponseSchema>;
 
+// ---------- Place Details: avaliações de UM lugar ----------
+
+// O Google devolve no máximo 5 avaliações ("as mais relevantes").
+// Pedimos só o campo `reviews`: nada de fotos, horários etc.
+const ReviewSchema = z.object({
+  rating: z.number().optional(),
+  text: z.object({ text: z.string() }).optional(),
+  originalText: z.object({ text: z.string() }).optional(),
+  relativePublishTimeDescription: z.string().optional(),
+});
+
+const PlaceReviewsSchema = z.object({
+  reviews: z.array(ReviewSchema).default([]),
+});
+
+/** Avaliação já "limpa": sem nome nem foto de quem escreveu (a IA não precisa disso). */
+export type Review = { rating: number | null; text: string; when: string | null };
+
+export async function getPlaceReviews(params: { apiKey: string; placeId: string }): Promise<Review[]> {
+  const url = `https://places.googleapis.com/v1/places/${encodeURIComponent(params.placeId)}?languageCode=pt-BR`;
+  const res = await fetch(url, {
+    headers: {
+      "X-Goog-Api-Key": params.apiKey,
+      "X-Goog-FieldMask": "reviews",
+    },
+  });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    console.error(`[google place details] ${res.status}: ${detail.slice(0, 500)}`);
+    throw new HttpError(502, `O Google recusou a busca de avaliações (HTTP ${res.status}).`, "GOOGLE_ERROR");
+  }
+
+  const parsed = PlaceReviewsSchema.safeParse(await res.json());
+  if (!parsed.success) {
+    throw new HttpError(502, "O Google respondeu as avaliações num formato inesperado.", "GOOGLE_BAD_RESPONSE");
+  }
+
+  return parsed.data.reviews
+    .map((r) => ({
+      rating: r.rating ?? null,
+      // prefere o texto original (sem tradução automática)
+      text: (r.originalText?.text ?? r.text?.text ?? "").trim(),
+      when: r.relativePublishTimeDescription ?? null,
+    }))
+    .filter((r) => r.text.length > 0);
+}
+
+// ---------- Text Search ----------
+
 /** Uma chamada = uma página (até 20 lugares). */
 export async function searchTextPage(params: {
   apiKey: string;
