@@ -39,6 +39,19 @@ leadsRouter.get("/", async (req, res) => {
   res.json({ items, total, page: query.page, pageSize: query.pageSize });
 });
 
+// GET /leads/followups/today: quem está ENVIADO e já devia receber follow-up
+// (hoje ou atrasado). Os mais atrasados vêm primeiro.
+leadsRouter.get("/followups/today", async (_req, res) => {
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999); // fuso do computador onde a API roda
+
+  const items = await prisma.lead.findMany({
+    where: { status: "ENVIADO", nextFollowupAt: { lte: endOfToday } },
+    orderBy: { nextFollowupAt: "asc" },
+  });
+  res.json({ items, total: items.length });
+});
+
 // PATCH /leads/:id: muda só o que veio no body (status, notas, mensagem).
 // .strict() recusa campos desconhecidos: ninguém troca o placeId ou o nome por aqui.
 const LeadPatchSchema = z
@@ -56,7 +69,14 @@ leadsRouter.patch("/:id", async (req, res) => {
   const exists = await prisma.lead.findUnique({ where: { id: req.params.id }, select: { id: true } });
   if (!exists) throw new HttpError(404, "Lead não encontrado", "LEAD_NOT_FOUND");
 
-  const lead = await prisma.lead.update({ where: { id: req.params.id }, data });
+  // Regra do funil: follow-up só existe pra quem está ENVIADO (esperando resposta).
+  // Respondeu, marcou reunião, fechou ou foi descartado? O lembrete some.
+  const followupRule = data.status && data.status !== "ENVIADO" ? { nextFollowupAt: null } : {};
+
+  const lead = await prisma.lead.update({
+    where: { id: req.params.id },
+    data: { ...data, ...followupRule },
+  });
   res.json(lead);
 });
 
@@ -94,11 +114,13 @@ const ContactedSchema = z
   .object({
     // o texto que você escolheu/editou, pra ficar registrado no lead
     message: z.string().trim().min(1).max(2000).optional(),
+    // false = foi o "último contato": não agenda outro lembrete
+    scheduleFollowup: z.boolean().default(true),
   })
   .strict();
 
 leadsRouter.post("/:id/contacted", async (req, res) => {
-  const { message } = ContactedSchema.parse(req.body ?? {});
+  const { message, scheduleFollowup } = ContactedSchema.parse(req.body ?? {});
 
   const exists = await prisma.lead.findUnique({ where: { id: req.params.id }, select: { id: true } });
   if (!exists) throw new HttpError(404, "Lead não encontrado", "LEAD_NOT_FOUND");
@@ -111,7 +133,7 @@ leadsRouter.post("/:id/contacted", async (req, res) => {
     data: {
       status: "ENVIADO",
       contactedAt: now,
-      nextFollowupAt: followup,
+      nextFollowupAt: scheduleFollowup ? followup : null,
       ...(message ? { message } : {}),
     },
   });

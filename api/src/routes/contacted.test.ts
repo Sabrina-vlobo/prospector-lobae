@@ -40,6 +40,13 @@ describe("POST /leads/:id/contacted", () => {
     });
   });
 
+  it("no 'último contato' (scheduleFollowup: false) não agenda outro lembrete", async () => {
+    await request(app).post("/leads/lead-1/contacted").send({ scheduleFollowup: false });
+
+    const { data } = vi.mocked(prisma.lead.update).mock.calls[0]![0];
+    expect(data).toMatchObject({ status: "ENVIADO", contactedAt: NOW, nextFollowupAt: null });
+  });
+
   it("salva a mensagem que foi enviada", async () => {
     await request(app).post("/leads/lead-1/contacted").send({ message: "  Oi! Tudo bem?  " });
 

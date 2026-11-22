@@ -1,5 +1,5 @@
 import request from "supertest";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../lib/prisma.js", () => ({
   prisma: {
@@ -47,6 +47,30 @@ describe("GET /leads", () => {
   });
 });
 
+describe("GET /leads/followups/today", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("busca quem está ENVIADO com follow-up até o fim de hoje, mais atrasados primeiro", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 10, 22, 9, 30)); // 22/11/2026 09:30 no fuso local
+    vi.mocked(prisma.lead.findMany).mockResolvedValue([fakeLead] as never);
+
+    const res = await request(app).get("/leads/followups/today");
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ items: [fakeLead], total: 1 });
+
+    const args = vi.mocked(prisma.lead.findMany).mock.calls[0]![0]!;
+    expect(args.where).toEqual({
+      status: "ENVIADO",
+      nextFollowupAt: { lte: new Date(2026, 10, 22, 23, 59, 59, 999) },
+    });
+    expect(args.orderBy).toEqual({ nextFollowupAt: "asc" });
+  });
+});
+
 describe("PATCH /leads/:id", () => {
   it("atualiza o status", async () => {
     vi.mocked(prisma.lead.findUnique).mockResolvedValue({ id: "lead-1" } as never);
@@ -56,7 +80,29 @@ describe("PATCH /leads/:id", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.status).toBe("DESCARTADO");
-    expect(prisma.lead.update).toHaveBeenCalledWith({ where: { id: "lead-1" }, data: { status: "DESCARTADO" } });
+    // saiu de ENVIADO → o lembrete de follow-up é cancelado junto
+    expect(prisma.lead.update).toHaveBeenCalledWith({
+      where: { id: "lead-1" },
+      data: { status: "DESCARTADO", nextFollowupAt: null },
+    });
+  });
+
+  it("mantém o follow-up quando o status continua ENVIADO", async () => {
+    vi.mocked(prisma.lead.findUnique).mockResolvedValue({ id: "lead-1" } as never);
+    vi.mocked(prisma.lead.update).mockResolvedValue(fakeLead as never);
+
+    await request(app).patch("/leads/lead-1").send({ status: "ENVIADO" });
+
+    expect(vi.mocked(prisma.lead.update).mock.calls[0]![0].data).toEqual({ status: "ENVIADO" });
+  });
+
+  it("salvar só as notas não mexe em status nem follow-up", async () => {
+    vi.mocked(prisma.lead.findUnique).mockResolvedValue({ id: "lead-1" } as never);
+    vi.mocked(prisma.lead.update).mockResolvedValue(fakeLead as never);
+
+    await request(app).patch("/leads/lead-1").send({ notes: "Ligar depois das 14h" });
+
+    expect(vi.mocked(prisma.lead.update).mock.calls[0]![0].data).toEqual({ notes: "Ligar depois das 14h" });
   });
 
   it("recusa campos que não podem ser editados (ex: placeId)", async () => {
