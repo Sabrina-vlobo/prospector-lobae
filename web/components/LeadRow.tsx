@@ -3,6 +3,7 @@
 import { STATUS_META } from "@/lib/status";
 import { LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/types";
 import { MessageComposer } from "./MessageComposer";
+import { NotesEditor } from "./NotesEditor";
 import styles from "./LeadsTable.module.css";
 
 type Props = {
@@ -157,6 +158,8 @@ function LeadDetails({ lead }: { lead: Lead }) {
           )}
         </div>
 
+        <NotesEditor key={lead.id} lead={lead} />
+
         {/* Só aparece se o lead foi qualificado pela IA em algum momento */}
         {lead.hook && (
           <div>
@@ -173,7 +176,8 @@ function LeadDetails({ lead }: { lead: Lead }) {
       </div>
 
       <div className={styles.detailsCol}>
-        <MessageComposer lead={lead} />
+        {/* key com o status: mudou o status, o compositor recomeça no modo certo */}
+        <MessageComposer key={lead.id + lead.status} lead={lead} />
       </div>
     </div>
   );

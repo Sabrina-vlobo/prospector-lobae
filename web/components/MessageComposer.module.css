@@ -123,3 +123,24 @@
   color: var(--cobalt);
   font-weight: 600;
 }
+
+/* Mensagem anterior (no follow-up): fica recolhida, abre com um clique */
+.previous {
+  border-radius: var(--radius-sm);
+  background: rgb(11 14 42 / 0.04);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.previous summary {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.previous p {
+  margin: 0;
+  padding: 0 12px 12px;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
