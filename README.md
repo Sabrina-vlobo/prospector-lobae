@@ -147,6 +147,9 @@ Modelo de linguagem não é contrato: mesmo pedindo JSON, a resposta pode vir co
 **Por que contar as chamadas ao Google no banco?**
 Um limite só na memória zera toda vez que a API reinicia (e em dev ela reinicia a cada arquivo salvo). No banco, o contador sobrevive. A "reserva" de uma chamada é um único `UPDATE ... WHERE calls < limite`: o próprio Postgres confere e soma no mesmo passo, então nem duas buscas simultâneas furam o limite. A chamada é contada **antes** de ir ao Google; se o Google falhar, ela continua contada (melhor errar para menos).
 
+**Por que, por padrão, a busca não salva quem já tem site?**
+O foco do Prospector é quem **não tem site** ou tem **só rede social** (Instagram, Linktree, wa.me...). O Google não deixa filtrar isso na busca e cobra a chamada igual, então o filtro acontece depois de classificar e antes de salvar: o resumo mostra quantos tinham site, mas eles não entram no funil. Dá para desmarcar a opção no formulário (`skipRealSites: false`).
+
 **Por que o upsert não mexe em status e notas?**
 Buscar "barbearia em Mogi" de novo atualiza só os dados que vêm do Google (telefone, nota, site...). Status do funil, notas e mensagem são trabalho seu e nunca são sobrescritos por uma busca repetida.
 
