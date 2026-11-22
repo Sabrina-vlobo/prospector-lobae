@@ -18,9 +18,13 @@ O Prospector automatiza a parte chata e deixa a parte humana com quem prospecta:
 
 ## Demo
 
-![Tela inicial com contadores do funil (dados fictícios)](docs/fase-0-home.jpg)
+![Fluxo completo: buscar, filtrar, montar a mensagem e mover o lead no funil](docs/demo.gif)
 
-_Todos os dados nos prints são fictícios (seed). GIF do fluxo completo: em breve._
+1. **Visão geral:** busca "barbearia" em "Mogi das Cruzes" e mostra quantos não têm site.
+2. **Leads:** filtra por nota e abre o **Contatar**, alternando entre os modelos de mensagem.
+3. **Funil:** follow-up do dia, card arrastado de "Enviado" para "Respondeu" e o painel lateral com as sugestões de follow-up.
+
+_Gravado numa instância de demo com banco separado, só com os leads fictícios do seed (telefones com DDD 00, por isso o botão do WhatsApp aparece desativado). A resposta da busca no Google foi simulada na gravação, para não chamar a API nem gravar negócios reais._
 
 ## Arquitetura
 
