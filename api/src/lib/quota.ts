@@ -2,6 +2,15 @@ import { prisma } from "./prisma.js";
 import { HttpError } from "./errors.js";
 
 export const GOOGLE_PLACES = "google_places";
+export const GOOGLE_PLACE_DETAILS = "google_place_details";
+export const ANTHROPIC = "anthropic";
+
+// Texto do aviso quando a cota acaba: o que é e qual variável do .env aumenta o limite.
+const QUOTA_LABELS: Record<string, { what: string; envVar: string }> = {
+  [GOOGLE_PLACES]: { what: "buscas no Google", envVar: "GOOGLE_MONTHLY_CALL_LIMIT" },
+  [GOOGLE_PLACE_DETAILS]: { what: "buscas de avaliações no Google", envVar: "GOOGLE_DETAILS_MONTHLY_LIMIT" },
+  [ANTHROPIC]: { what: "qualificações com IA", envVar: "ANTHROPIC_MONTHLY_CALL_LIMIT" },
+};
 
 /** Mês atual no formato "2026-11" (UTC). */
 export function currentPeriod(now = new Date()): string {
@@ -38,9 +47,10 @@ export async function reserveCall(provider: string, limit: number): Promise<void
   });
 
   if (count === 0) {
+    const label = QUOTA_LABELS[provider] ?? { what: `chamadas (${provider})`, envVar: "o limite" };
     throw new HttpError(
       429,
-      `Limite mensal de ${limit} chamadas ao Google atingido. Ajuste GOOGLE_MONTHLY_CALL_LIMIT no api/.env se quiser liberar mais.`,
+      `Limite mensal de ${limit} ${label.what} atingido. Ajuste ${label.envVar} no api/.env se quiser liberar mais.`,
       "QUOTA_EXCEEDED",
     );
   }

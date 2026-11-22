@@ -14,11 +14,17 @@ const EnvSchema = z.object({
   GOOGLE_MONTHLY_CALL_LIMIT: z.coerce.number().int().min(0).default(200),
   // Cada página = 1 chamada = até 20 negócios. O Google entrega no máximo 3 páginas.
   GOOGLE_MAX_PAGES_PER_SEARCH: z.coerce.number().int().min(1).max(3).default(3),
+  // Buscar avaliações (Place Details) é outro tipo de chamada, com cota grátis própria e menor.
+  GOOGLE_DETAILS_MONTHLY_LIMIT: z.coerce.number().int().min(0).default(100),
 
   // ---------- Claude (Fase 3) ----------
   ANTHROPIC_API_KEY: z.string().optional().transform((v) => v || undefined),
   // Modelo configurável. Padrão: o mais barato (Haiku).
   ANTHROPIC_MODEL: z.string().min(1).default("claude-haiku-5-5"),
+  // Freio de gastos da IA: máximo de qualificações por mês.
+  ANTHROPIC_MONTHLY_CALL_LIMIT: z.coerce.number().int().min(0).default(300),
+  // Máximo de leads por "Qualificar selecionados".
+  QUALIFY_BATCH_MAX: z.coerce.number().int().min(1).max(50).default(10),
 });
 
 export const env = EnvSchema.parse(process.env);
