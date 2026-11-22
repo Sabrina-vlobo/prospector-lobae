@@ -51,3 +51,48 @@ export type Usage = {
     configured: boolean;
   };
 };
+
+// Um lead como a API devolve (datas chegam como texto ISO no JSON).
+export type Lead = {
+  id: string;
+  placeId: string;
+  name: string;
+  category: string | null;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  website: string | null;
+  websiteType: WebsiteType;
+  rating: number | null;
+  reviewsCount: number | null;
+  mapsUrl: string | null;
+  status: LeadStatus;
+  score: number | null;
+  scoreReason: string | null;
+  hook: string | null;
+  message: string | null;
+  notes: string | null;
+  contactedAt: string | null;
+  nextFollowupAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type LeadSort = "reviews" | "rating" | "name" | "recent";
+
+export type LeadFilters = {
+  q: string;
+  websiteType: WebsiteType[];
+  status: LeadStatus | "";
+  minRating: string; // "" = qualquer
+  minReviews: string; // "" = qualquer
+  sort: LeadSort;
+  page: number;
+};
+
+export type LeadsPage = {
+  items: Lead[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
