@@ -52,6 +52,14 @@ leadsRouter.get("/followups/today", async (_req, res) => {
   res.json({ items, total: items.length });
 });
 
+// GET /leads/:id: um lead só (usado no painel lateral do funil).
+// Fica DEPOIS de /stats e /followups/today: o Express testa as rotas em ordem.
+leadsRouter.get("/:id", async (req, res) => {
+  const lead = await prisma.lead.findUnique({ where: { id: req.params.id } });
+  if (!lead) throw new HttpError(404, "Lead não encontrado", "LEAD_NOT_FOUND");
+  res.json(lead);
+});
+
 // PATCH /leads/:id: muda só o que veio no body (status, notas, mensagem).
 // .strict() recusa campos desconhecidos: ninguém troca o placeId ou o nome por aqui.
 const LeadPatchSchema = z

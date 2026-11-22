@@ -71,6 +71,28 @@ describe("GET /leads/followups/today", () => {
   });
 });
 
+describe("GET /leads/:id", () => {
+  it("devolve o lead", async () => {
+    vi.mocked(prisma.lead.findUnique).mockResolvedValue(fakeLead as never);
+    const res = await request(app).get("/leads/lead-1");
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(fakeLead);
+  });
+
+  it("responde 404 quando não existe", async () => {
+    vi.mocked(prisma.lead.findUnique).mockResolvedValue(null as never);
+    const res = await request(app).get("/leads/nao-existe");
+    expect(res.status).toBe(404);
+  });
+
+  it("não engole as rotas fixas (/followups/today continua sendo a lista)", async () => {
+    vi.mocked(prisma.lead.findMany).mockResolvedValue([] as never);
+    const res = await request(app).get("/leads/followups/today");
+    expect(res.body).toEqual({ items: [], total: 0 });
+    expect(prisma.lead.findUnique).not.toHaveBeenCalled();
+  });
+});
+
 describe("PATCH /leads/:id", () => {
   it("atualiza o status", async () => {
     vi.mocked(prisma.lead.findUnique).mockResolvedValue({ id: "lead-1" } as never);
