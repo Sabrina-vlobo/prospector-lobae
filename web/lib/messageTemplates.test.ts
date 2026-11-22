@@ -57,7 +57,16 @@ describe("buildMessageOptions", () => {
   it("inclui a sugestão da IA como 4ª opção quando existe", () => {
     const options = buildMessageOptions({ ...base, message: "Mensagem que a IA escreveu" });
     expect(options).toHaveLength(4);
-    expect(options[3]).toEqual({ id: "ia", label: "Sugestão da IA", text: "Mensagem que a IA escreveu" });
+    expect(options[3]).toEqual({ id: "salva", label: "Sugestão da IA", text: "Mensagem que a IA escreveu" });
+  });
+
+  it("chama de 'Última enviada' a mensagem salva de quem já foi contatado", () => {
+    const options = buildMessageOptions({
+      ...base,
+      message: "Oi! Mensagem que eu enviei",
+      contactedAt: "2026-11-22T15:00:00.000Z",
+    });
+    expect(options[3]!.label).toBe("Última enviada");
   });
 });
 

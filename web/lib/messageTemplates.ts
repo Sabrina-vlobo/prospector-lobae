@@ -6,14 +6,15 @@ import type { Lead } from "./types";
 export const SIGNATURE = "Sabrina, da LOBAE";
 export const OPT_OUT_LINE = "Se não fizer sentido, é só me avisar que não mando mais.";
 
-export type TemplateId = "direta" | "elogio" | "curta" | "ia";
+export type TemplateId = "direta" | "elogio" | "curta" | "salva";
 
 export type MessageOption = { id: TemplateId; label: string; text: string };
 
 type LeadForMessage = Pick<
   Lead,
   "name" | "category" | "city" | "rating" | "reviewsCount" | "websiteType" | "website" | "message"
->;
+> &
+  Partial<Pick<Lead, "contactedAt">>;
 
 // ---------- pedacinhos reaproveitados ----------
 
@@ -94,13 +95,22 @@ function curta(lead: LeadForMessage): string {
   );
 }
 
-/** Todas as opções pra esse lead. Se ele já foi qualificado pela IA, a sugestão dela entra como 4ª. */
+/**
+ * Todas as opções pra esse lead. Se ele já tem uma mensagem salva, ela entra como 4ª:
+ * "Última enviada" (se você já contatou) ou "Sugestão da IA" (se foi qualificado).
+ */
 export function buildMessageOptions(lead: LeadForMessage): MessageOption[] {
   const options: MessageOption[] = [
     { id: "direta", label: "Direta", text: direta(lead) },
     { id: "elogio", label: "Elogio + pergunta", text: elogio(lead) },
     { id: "curta", label: "Curta", text: curta(lead) },
   ];
-  if (lead.message) options.push({ id: "ia", label: "Sugestão da IA", text: lead.message });
+  if (lead.message) {
+    options.push({
+      id: "salva",
+      label: lead.contactedAt ? "Última enviada" : "Sugestão da IA",
+      text: lead.message,
+    });
+  }
   return options;
 }
