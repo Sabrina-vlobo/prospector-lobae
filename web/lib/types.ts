@@ -28,6 +28,7 @@ export type SearchInput = {
   segment: string;
   city: string;
   pages: number;
+  skipRealSites: boolean;
 };
 
 export type SearchSummary = {
@@ -36,6 +37,7 @@ export type SearchSummary = {
   found: number;
   created: number;
   updated: number;
+  skipped: number;
   byWebsiteType: Record<WebsiteType, number>;
   usage: { used: number; limit: number; period: string };
 };

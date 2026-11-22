@@ -17,6 +17,7 @@ export function SearchForm() {
   const [segment, setSegment] = useState("");
   const [city, setCity] = useState("");
   const [pages, setPages] = useState(1);
+  const [skipRealSites, setSkipRealSites] = useState(true);
 
   // Quanto da cota do Google já foi usado neste mês
   const usageQuery = useQuery({
@@ -42,7 +43,7 @@ export function SearchForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    search.mutate({ segment: segment.trim(), city: city.trim(), pages });
+    search.mutate({ segment: segment.trim(), city: city.trim(), pages, skipRealSites });
   }
 
   const pageOptions = PAGE_OPTIONS.filter((o) => !google || o.value <= google.maxPagesPerSearch);
@@ -104,6 +105,17 @@ export function SearchForm() {
         <button className={`btn ${styles.submit}`} type="submit" disabled={disabled}>
           {search.isPending ? "Buscando…" : "Buscar"}
         </button>
+
+        <label className={styles.check}>
+          <input
+            type="checkbox"
+            checked={skipRealSites}
+            onChange={(e) => setSkipRealSites(e.target.checked)}
+          />
+          <span>
+            Salvar só quem <strong>não tem site</strong> ou tem <strong>só rede social</strong>
+          </span>
+        </label>
       </form>
 
       {google && (
@@ -184,6 +196,7 @@ function SearchResult({ summary }: { summary: SearchSummary }) {
         </li>
         <li className={styles.chip}>
           <strong>{summary.byWebsiteType.real}</strong> com site
+          {summary.skipped > 0 && " (não salvos)"}
         </li>
       </ul>
     </div>
