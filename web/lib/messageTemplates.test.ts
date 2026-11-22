@@ -1,0 +1,75 @@
+import { describe, expect, it } from "vitest";
+import { OPT_OUT_LINE, SIGNATURE, buildMessageOptions, socialNetworkName } from "./messageTemplates";
+
+const base = {
+  name: "Barbearia Exemplo",
+  category: "barbearia",
+  city: "Cidade Exemplo",
+  rating: 4.8,
+  reviewsCount: 212,
+  websiteType: "none" as const,
+  website: null,
+  message: null,
+};
+
+describe("buildMessageOptions", () => {
+  it("gera os 3 modelos, todos com o nome, assinatura e linha de saída", () => {
+    const options = buildMessageOptions(base);
+
+    expect(options.map((o) => o.id)).toEqual(["direta", "elogio", "curta"]);
+    for (const option of options) {
+      expect(option.text).toContain("Barbearia Exemplo");
+      expect(option.text.endsWith(`${SIGNATURE}\n${OPT_OUT_LINE}`)).toBe(true);
+    }
+  });
+
+  it("elogia com a nota no formato brasileiro", () => {
+    const [direta] = buildMessageOptions(base);
+    expect(direta!.text).toContain("nota 4,8 com 212 avaliações");
+  });
+
+  it("não cita nota baixa nem inexistente", () => {
+    const [semNota] = buildMessageOptions({ ...base, rating: null });
+    const [notaBaixa] = buildMessageOptions({ ...base, rating: 3.2 });
+    expect(semNota!.text).not.toContain("nota");
+    expect(notaBaixa!.text).not.toContain("3,2");
+  });
+
+  it("fala da rede social certa quando o negócio só tem Instagram", () => {
+    const [direta] = buildMessageOptions({
+      ...base,
+      websiteType: "social",
+      website: "https://instagram.com/barbearia.exemplo",
+    });
+    expect(direta!.text).toContain("hoje vocês estão só no Instagram");
+  });
+
+  it("diz que não tem site quando não tem nada", () => {
+    const [direta] = buildMessageOptions(base);
+    expect(direta!.text).toContain("vocês ainda não têm um site");
+  });
+
+  it("usa segmento e cidade no modelo de elogio", () => {
+    const elogio = buildMessageOptions(base)[1]!;
+    expect(elogio.text).toContain("procurando barbearia em Cidade Exemplo");
+  });
+
+  it("inclui a sugestão da IA como 4ª opção quando existe", () => {
+    const options = buildMessageOptions({ ...base, message: "Mensagem que a IA escreveu" });
+    expect(options).toHaveLength(4);
+    expect(options[3]).toEqual({ id: "ia", label: "Sugestão da IA", text: "Mensagem que a IA escreveu" });
+  });
+});
+
+describe("socialNetworkName", () => {
+  it.each([
+    ["https://www.instagram.com/x", "Instagram"],
+    ["https://pt-br.facebook.com/x", "Facebook"],
+    ["https://linktr.ee/x", "Linktree"],
+    ["https://wa.me/5500000000000", "WhatsApp"],
+    ["https://example.com", null],
+    [null, null],
+  ])("%s → %s", (url, expected) => {
+    expect(socialNetworkName(url)).toBe(expected);
+  });
+});
