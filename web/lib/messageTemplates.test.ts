@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { OPT_OUT_LINE, SIGNATURE, buildMessageOptions, socialNetworkName } from "./messageTemplates";
+import {
+  OPT_OUT_LINE,
+  SIGNATURE,
+  buildFollowupOptions,
+  buildMessageOptions,
+  socialNetworkName,
+} from "./messageTemplates";
 
 const base = {
   name: "Barbearia Exemplo",
@@ -67,6 +73,47 @@ describe("buildMessageOptions", () => {
       contactedAt: "2026-11-22T15:00:00.000Z",
     });
     expect(options[3]!.label).toBe("Última enviada");
+  });
+});
+
+describe("regra: primeiro contato sem oferecer demo", () => {
+  it.each([
+    ["sem site", base],
+    ["só Instagram", { ...base, websiteType: "social" as const, website: "https://instagram.com/x" }],
+  ])("nenhum modelo oferece exemplo, demo ou ideia pronta (%s)", (_label, lead) => {
+    for (const option of buildMessageOptions(lead)) {
+      // tira o nome do negócio ("Barbearia Exemplo") antes de procurar as palavras proibidas
+      const withoutName = option.text.replaceAll(lead.name, "");
+      expect(withoutName).not.toMatch(/exemplo|demo|ideia de como|te mostrar|te mandar/i);
+    }
+  });
+
+  it("todos terminam com uma pergunta antes da assinatura", () => {
+    for (const option of buildMessageOptions(base)) {
+      const body = option.text.split(`\n\n${SIGNATURE}`)[0]!;
+      expect(body).toMatch(/\?/);
+    }
+  });
+});
+
+describe("buildFollowupOptions", () => {
+  const followups = buildFollowupOptions(base);
+
+  it("gera 3 sugestões com o nome do negócio e assinatura", () => {
+    expect(followups.map((f) => f.id)).toEqual(["followup-leve", "followup-pergunta", "followup-final"]);
+    for (const f of followups) {
+      expect(f.text).toContain("Barbearia Exemplo");
+      expect(f.text).toContain(SIGNATURE);
+    }
+  });
+
+  it("só o 'Último contato' deixa de agendar novo follow-up", () => {
+    expect(followups.map((f) => f.scheduleFollowup ?? true)).toEqual([true, true, false]);
+  });
+
+  it("os dois primeiros mantêm a linha de saída", () => {
+    expect(followups[0]!.text.endsWith(OPT_OUT_LINE)).toBe(true);
+    expect(followups[1]!.text.endsWith(OPT_OUT_LINE)).toBe(true);
   });
 });
 

@@ -6,9 +6,22 @@ import type { Lead } from "./types";
 export const SIGNATURE = "Sabrina, da LOBAE";
 export const OPT_OUT_LINE = "Se não fizer sentido, é só me avisar que não mando mais.";
 
-export type TemplateId = "direta" | "elogio" | "curta" | "salva";
+export type TemplateId =
+  | "direta"
+  | "elogio"
+  | "curta"
+  | "salva"
+  | "followup-leve"
+  | "followup-pergunta"
+  | "followup-final";
 
-export type MessageOption = { id: TemplateId; label: string; text: string };
+export type MessageOption = {
+  id: TemplateId;
+  label: string;
+  text: string;
+  /** false = depois de enviar, não agenda outro follow-up (padrão: agenda em 3 dias) */
+  scheduleFollowup?: boolean;
+};
 
 type LeadForMessage = Pick<
   Lead,
@@ -65,34 +78,69 @@ function withSignature(body: string): string {
   return `${body}\n\n${SIGNATURE}\n${OPT_OUT_LINE}`;
 }
 
-// ---------- os 3 modelos ----------
+// ---------- primeiro contato ----------
+// Regra: terminar com uma PERGUNTA ABERTA, sem oferecer demo, exemplo ou "ideia de como ficaria".
+// Quem responde "sim" puxa a conversa; aí você explica do seu jeito.
 
-/** 1. Direta: elogio rápido + o que você faz + pergunta. */
+/** 1. Direta: elogio rápido + o que você faz + pergunta se faz sentido. */
 function direta(lead: LeadForMessage): string {
   const rating = ratingPhrase(lead);
   const intro = rating
     ? `Oi! Tudo bem? Vi a ${lead.name} no Google, ${rating}, parabéns!`
     : `Oi! Tudo bem? Vi a ${lead.name} no Google.`;
   return withSignature(
-    `${intro} Reparei que ${presencePhrase(lead)}. Eu crio ${benefitPhrase(lead)}. Posso te mandar uma ideia de como ficaria pra vocês?`,
+    `${intro} Reparei que ${presencePhrase(lead)}. Eu crio ${benefitPhrase(lead)}. Ter um site é algo que faz sentido pra vocês hoje?`,
   );
 }
 
-/** 2. Elogio + pergunta: puxa conversa antes de oferecer. */
+/** 2. Elogio + pergunta: puxa conversa antes de falar de site. */
 function elogio(lead: LeadForMessage): string {
   const where = lead.category && lead.city ? `procurando ${lead.category} em ${lead.city}` : "pesquisando no Google";
   const praise =
     lead.rating != null && lead.rating >= 4.5 ? "e as avaliações de vocês são ótimas!" : "e gostei bastante do trabalho de vocês!";
   return withSignature(
-    `Oi, tudo bem? Achei a ${lead.name} ${where} ${praise} Fiquei curiosa: hoje os clientes chegam mais pelo boca a boca ou pela internet? Pergunto porque eu faço sites pra pequenos negócios e acho que daria pra vocês aparecerem pra muito mais gente.`,
+    `Oi, tudo bem? Achei a ${lead.name} ${where} ${praise} Fiquei curiosa: hoje os clientes chegam mais pelo boca a boca ou pela internet? Pergunto porque eu faço sites pra pequenos negócios e acho que vocês poderiam aparecer pra muito mais gente.`,
   );
 }
 
 /** 3. Curta: pra quem não gosta de textão. */
 function curta(lead: LeadForMessage): string {
   return withSignature(
-    `Oi, pessoal da ${lead.name}! Faço sites pra pequenos negócios e vi que ${presencePhrase(lead)}. Topam ver um exemplo rápido, sem compromisso?`,
+    `Oi, pessoal da ${lead.name}! Faço sites pra pequenos negócios e vi que ${presencePhrase(lead)}. Já pensaram em ter um? Se tiverem interesse, te explico rapidinho como funciona.`,
   );
+}
+
+// ---------- follow-up (status ENVIADO, sem resposta) ----------
+
+/** Leve: só confirma se a pessoa viu, sem pressão. */
+function followupLeve(lead: LeadForMessage): string {
+  return withSignature(
+    `Oi! Passando só pra saber se você conseguiu ver minha mensagem sobre um site pra ${lead.name}. Sem pressa, tá?`,
+  );
+}
+
+/** Pergunta direta: facilita o "agora não". */
+function followupPergunta(lead: LeadForMessage): string {
+  return withSignature(
+    `Oi, tudo bem? Voltando aqui rapidinho: um site pra ${lead.name} é algo que faz sentido agora, ou é melhor eu te chamar mais pra frente?`,
+  );
+}
+
+/** Último contato: encerra com elegância (e não agenda outro follow-up). */
+function followupFinal(lead: LeadForMessage): string {
+  return `Oi! Última mensagem, prometo. Se um dia quiserem um site pra ${lead.name}, é só me chamar aqui. Sucesso pra vocês!\n\n${SIGNATURE}`;
+}
+
+/**
+ * Sugestões de follow-up pra quem está como ENVIADO.
+ * `scheduleFollowup: false` no último: depois dele, não tem próximo lembrete.
+ */
+export function buildFollowupOptions(lead: LeadForMessage): MessageOption[] {
+  return [
+    { id: "followup-leve", label: "Lembrete leve", text: followupLeve(lead) },
+    { id: "followup-pergunta", label: "Pergunta direta", text: followupPergunta(lead) },
+    { id: "followup-final", label: "Último contato", text: followupFinal(lead), scheduleFollowup: false },
+  ];
 }
 
 /**
