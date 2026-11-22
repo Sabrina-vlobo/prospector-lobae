@@ -8,7 +8,11 @@ import { QualificationSchema, SYSTEM_PROMPT } from "./qualifyPrompt.js";
 // assim a API sobe normalmente mesmo sem a chave preenchida.
 let client: Anthropic | null = null;
 
-function getClient(): Anthropic {
+/**
+ * Confere se dá pra chamar o Claude. Quem usa chama isso ANTES de reservar cota:
+ * sem chave, não faz sentido gastar uma "vaga" do limite mensal.
+ */
+export function ensureClaudeConfigured(): void {
   if (!env.ANTHROPIC_API_KEY) {
     throw new HttpError(
       503,
@@ -16,6 +20,10 @@ function getClient(): Anthropic {
       "MISSING_ANTHROPIC_KEY",
     );
   }
+}
+
+function getClient(): Anthropic {
+  ensureClaudeConfigured();
   client ??= new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   return client;
 }

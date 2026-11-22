@@ -9,10 +9,11 @@ vi.mock("../lib/prisma.js", () => ({
 }));
 
 // A IA fica simulada: nenhum teste chama (nem paga) o Claude de verdade.
-vi.mock("../lib/claude.js", () => ({ askClaudeForQualification: vi.fn() }));
+vi.mock("../lib/claude.js", () => ({ askClaudeForQualification: vi.fn(), ensureClaudeConfigured: vi.fn() }));
 
 import { createApp } from "../app.js";
-import { askClaudeForQualification } from "../lib/claude.js";
+import { askClaudeForQualification, ensureClaudeConfigured } from "../lib/claude.js";
+import { HttpError } from "../lib/errors.js";
 import { prisma } from "../lib/prisma.js";
 
 const app = createApp();
@@ -111,6 +112,20 @@ describe("POST /leads/:id/qualify", () => {
     expect(res.status).toBe(502);
     expect(res.body.code).toBe("AI_BAD_OUTPUT");
     expect(prisma.lead.update).not.toHaveBeenCalled();
+  });
+
+  it("sem chave da IA: responde 503 sem gastar cota nem chamar o Google", async () => {
+    vi.mocked(prisma.lead.findUnique).mockResolvedValue(realLead as never);
+    vi.mocked(ensureClaudeConfigured).mockImplementation(() => {
+      throw new HttpError(503, "Falta a ANTHROPIC_API_KEY", "MISSING_ANTHROPIC_KEY");
+    });
+
+    const res = await request(app).post("/leads/lead-real/qualify");
+
+    expect(res.status).toBe(503);
+    expect(prisma.apiUsage.updateMany).not.toHaveBeenCalled(); // nenhuma cota reservada
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(askClaudeForQualification).not.toHaveBeenCalled();
   });
 
   it("responde 404 quando o lead não existe", async () => {

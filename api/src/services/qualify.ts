@@ -1,6 +1,6 @@
 import { env } from "../env.js";
 import type { Lead } from "../generated/prisma/client.js";
-import { askClaudeForQualification } from "../lib/claude.js";
+import { askClaudeForQualification, ensureClaudeConfigured } from "../lib/claude.js";
 import { HttpError } from "../lib/errors.js";
 import { getPlaceReviews, type Review } from "../lib/googlePlaces.js";
 import { prisma } from "../lib/prisma.js";
@@ -26,6 +26,9 @@ async function fetchReviews(lead: Lead): Promise<Review[]> {
 export async function qualifyLead(id: string): Promise<Lead> {
   const lead = await prisma.lead.findUnique({ where: { id } });
   if (!lead) throw new HttpError(404, "Lead não encontrado", "LEAD_NOT_FOUND");
+
+  // Sem chave da IA, para aqui: nem busca avaliações (que custam) nem reserva cota.
+  ensureClaudeConfigured();
 
   const reviews = await fetchReviews(lead);
   const userPrompt = buildUserPrompt(lead, reviews);
