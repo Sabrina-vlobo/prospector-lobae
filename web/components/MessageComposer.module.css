@@ -33,7 +33,7 @@
   height: 34px;
   padding: 0 14px;
   border: 1px solid var(--border-strong);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: var(--surface);
   color: var(--text-muted);
   font-size: 13px;
@@ -61,7 +61,7 @@
   width: 100%;
   padding: 14px 16px;
   border: 1px solid var(--border-strong);
-  border-radius: 14px 14px 14px 4px; /* "balão" de conversa */
+  border-radius: var(--r-md); /* "balão" de conversa */
   background: var(--surface);
   color: var(--text);
   font: inherit;

@@ -10,6 +10,7 @@ export default function LeadsPage() {
   return (
     <main className={styles.main}>
       <PageHeader
+        eyebrow="Prospecção"
         title="Leads"
         description="Filtre quem vale a pena chamar primeiro e monte a mensagem de contato."
       />

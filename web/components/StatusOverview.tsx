@@ -1,10 +1,11 @@
 "use client";
 
-import { Tray, WarningCircle } from "@phosphor-icons/react";
+import { WarningCircle } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
 import { STATUS_META } from "@/lib/status";
 import { LEAD_STATUSES, type LeadStats } from "@/lib/types";
+import { Character } from "./brand/Character";
 import styles from "./StatusOverview.module.css";
 
 export function StatusOverview() {
@@ -37,7 +38,7 @@ export function StatusOverview() {
   if (data.total === 0) {
     return (
       <div className={styles.notice}>
-        <Tray size={22} className={styles.noticeIcon} aria-hidden />
+        <Character scale={2} />
         <div className={styles.noticeBody}>
           <p className={styles.noticeTitle}>Nenhum lead por aqui ainda.</p>
           <p className={styles.noticeText}>Faça uma busca abaixo pra trazer os primeiros negócios.</p>

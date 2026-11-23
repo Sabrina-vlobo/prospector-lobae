@@ -6,10 +6,11 @@
   padding: 22px 22px 0;
   /* esconde as linhas finas da última coluna/linha, que encostariam na borda */
   overflow: hidden;
-  border: 1px solid var(--border);
   border-radius: var(--r-lg);
   background: var(--surface);
-  box-shadow: var(--shadow-sm);
+  /* quadro da marca: moldura + sombra dura */
+  border: 1px solid var(--frame);
+  box-shadow: var(--shadow-md);
 }
 
 .head {
@@ -26,10 +27,12 @@
 }
 
 .totalNumber {
-  font-size: 40px;
+  font-family: var(--font-tag), monospace;
+  font-size: 44px;
   line-height: 1;
-  font-weight: 750;
-  letter-spacing: -0.04em;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--primary-text);
   font-variant-numeric: tabular-nums;
 }
 
@@ -97,14 +100,15 @@
 .swatch {
   width: 8px;
   height: 8px;
-  border-radius: 2px;
+  border-radius: var(--r-sm);
 }
 
 .count {
-  font-size: 28px;
+  font-family: var(--font-tag), monospace;
+  font-size: 30px;
   line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-weight: 400;
+  letter-spacing: 0;
   font-variant-numeric: tabular-nums;
 }
 

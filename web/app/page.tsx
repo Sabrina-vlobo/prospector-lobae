@@ -9,6 +9,7 @@ export default function HomePage() {
   return (
     <main className={styles.main}>
       <PageHeader
+        eyebrow="Painel"
         title="Visão geral"
         description="Quantos negócios estão em cada etapa e uma busca rápida pra trazer novos."
       />

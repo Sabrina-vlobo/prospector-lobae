@@ -9,7 +9,8 @@
   border: 0;
   background: var(--surface);
   color: var(--text);
-  box-shadow: -12px 0 40px rgb(var(--shadow-rgb) / 0.18);
+  /* sombra dura da marca: uma faixa tinta (claro) ou cobalto (escuro) na borda */
+  box-shadow: -6px 0 0 var(--shadow-hard);
 }
 
 /* Fundo escurecido atrás do painel */
@@ -74,7 +75,7 @@
   width: 36px;
   height: 36px;
   border: 1px solid var(--border-strong);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: var(--surface);
   color: var(--text);
   cursor: pointer;

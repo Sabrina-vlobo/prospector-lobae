@@ -9,6 +9,7 @@ export default function FunnelPage() {
   return (
     <main className={`${styles.main} ${styles.wide}`}>
       <PageHeader
+        eyebrow="Conversas"
         title="Funil"
         description="Arraste os cards conforme a conversa anda. Os follow-ups do dia ficam no topo."
       />

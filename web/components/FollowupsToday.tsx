@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
 import { followupLabel, shortDate } from "@/lib/dates";
 import type { Lead } from "@/lib/types";
+import { Character } from "./brand/Character";
 import styles from "./FollowupsToday.module.css";
 
 export type FollowupsResponse = { items: Lead[]; total: number };
@@ -39,7 +40,12 @@ export function FollowupsToday({ onOpenLead }: { onOpenLead: (id: string) => voi
           {error.message}
         </p>
       ) : data.total === 0 ? (
-        <p className={styles.muted}>Nenhum follow-up pendente. Quando alguém ficar 3 dias sem responder, aparece aqui.</p>
+        <div className={styles.empty}>
+          <Character scale={1} />
+          <p className={styles.muted}>
+            Nenhum follow-up pra hoje. Quando alguém ficar 3 dias sem responder, aparece aqui.
+          </p>
+        </div>
       ) : (
         <ul className={styles.list}>
           {data.items.map((lead) => {

@@ -5,7 +5,9 @@
   padding: clamp(20px, 3vw, 28px);
   border-radius: var(--r-lg);
   background: var(--surface);
-  border: 1px solid var(--border);
+  /* quadro da marca: moldura + sombra dura */
+  border: 1px solid var(--frame);
+  box-shadow: var(--shadow-md);
 }
 
 .head {
@@ -126,7 +128,7 @@
 
 .meter {
   height: 6px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: color-mix(in srgb, var(--mist-base) 50%, transparent);
   overflow: hidden;
 }
@@ -193,7 +195,7 @@
 
 .chip {
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: var(--surface-2);
   font-size: 14px;
   color: var(--text-muted);
