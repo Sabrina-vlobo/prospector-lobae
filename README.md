@@ -28,7 +28,7 @@ _Gravado numa instância de demo com banco separado, só com os leads fictícios
 
 ## Design
 
-Interface de software com a **identidade visual da LOBAE°**: a marca é pixel art, então a interface também é. Barra lateral cobalto com o logo oficial e a faixa de *dither* da capa, cantos retos, sombra dura (deslocada, sem desfoque), números em Silkscreen, etiquetas `> SEÇÃO` em pixel laranja e a personagem da marca no lugar do avatar genérico e nos estados vazios. Tudo em **tema claro e escuro**.
+Interface de software com a **identidade visual da LOBAE°**: a marca é pixel art, então a interface também é. Barra lateral cobalto com o logo oficial e a faixa de *dither* da capa, cantos retos, sombra dura (deslocada, sem desfoque), Silkscreen só em detalhes (etiquetas `> SEÇÃO` em pixel laranja, nome do produto e status), números e textos em Host Grotesk, e a personagem da marca no lugar do avatar genérico e nos estados vazios. Tudo em **tema claro e escuro**.
 
 - **Logo e símbolo vêm dos SVGs oficiais** (grade 10×10 / 42×10) e são desenhados como componente (`web/components/brand/LobaeLogo.tsx`), sempre em múltiplos de 10 px para cada célula virar pixels inteiros. O símbolo L° é o ícone da aba.
 - **Pixel art nunca borra:** a personagem é exibida só em escala inteira (×1, ×2...) com `image-rendering: pixelated`, regra do guia da marca.
