@@ -46,8 +46,8 @@
 
   /* sombras tingidas com a tinta da marca (nunca preto puro) */
   --shadow-rgb: 11 14 42;
-  --shadow-sm: 0 1px 2px rgb(var(--shadow-rgb) / 0.06);
-  --shadow-md: 0 6px 20px rgb(var(--shadow-rgb) / 0.08);
+  --shadow-sm: 2px 2px 0 var(--shadow-hard);
+  --shadow-md: 4px 4px 0 var(--shadow-hard);
   --shadow-lg: 0 24px 64px rgb(var(--shadow-rgb) / 0.22);
   --overlay: rgb(11 14 42 / 0.42);
 
@@ -59,11 +59,22 @@
   --st-fechou: #ff5a1f;
   --st-descartado: #e1e4ee;
 
-  /* forma: botões e chips em pílula, cards 16px, campos 10px */
-  --r-lg: 16px;
-  --r-md: 10px;
-  --r-sm: 6px;
-  --r-pill: 999px;
+  /* forma: a marca é pixel, então tudo tem canto reto */
+  --r-lg: 0;
+  --r-md: 0;
+  --r-sm: 0;
+  --r-pill: 0;
+
+  /* moldura e sombra DURA (deslocada, sem desfoque), como no guia da marca */
+  --frame: #0b0e2a;
+  --shadow-hard: #0b0e2a;
+
+  /* barra lateral: cobalto nos dois temas ("cor principal, fundos") */
+  --side-bg: #2433ff;
+  --side-text: #f1f2f6;
+  --side-muted: #c9cee6;
+  --side-line: rgb(241 242 246 / 0.18);
+  --side-dither: #0b0e2a;
 
   /* movimento (curvas fortes: as padrão do CSS são fracas) */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -101,8 +112,11 @@
     --danger-text: #ff8a80;
     --ring: #9aa1ff;
     --shadow-rgb: 0 0 0;
-    --shadow-sm: 0 1px 2px rgb(var(--shadow-rgb) / 0.4);
-    --shadow-md: 0 8px 24px rgb(var(--shadow-rgb) / 0.35);
+    --shadow-sm: 2px 2px 0 var(--shadow-hard);
+    --shadow-md: 4px 4px 0 var(--shadow-hard);
+    --frame: rgb(201 206 230 / 0.26);
+    --shadow-hard: #2433ff;
+    --side-dither: #070920;
     --shadow-lg: 0 24px 64px rgb(var(--shadow-rgb) / 0.6);
     --overlay: rgb(3 4 15 / 0.62);
     --st-novo: #4a5185;
@@ -137,8 +151,11 @@
   --danger-text: #ff8a80;
   --ring: #9aa1ff;
   --shadow-rgb: 0 0 0;
-  --shadow-sm: 0 1px 2px rgb(var(--shadow-rgb) / 0.4);
-  --shadow-md: 0 8px 24px rgb(var(--shadow-rgb) / 0.35);
+  --shadow-sm: 2px 2px 0 var(--shadow-hard);
+  --shadow-md: 4px 4px 0 var(--shadow-hard);
+  --frame: rgb(201 206 230 / 0.26);
+  --shadow-hard: #2433ff;
+  --side-dither: #070920;
   --shadow-lg: 0 24px 64px rgb(var(--shadow-rgb) / 0.6);
   --overlay: rgb(3 4 15 / 0.62);
   --st-novo: #4a5185;
@@ -222,7 +239,28 @@ a {
   color: var(--primary-text);
 }
 
-/* Botão principal: Laranja sinal (texto tinta = contraste ~6,5:1) */
+/* "> LEADS": a etiqueta de marca da LOBAE°, em pixel laranja */
+.eyebrow {
+  font-family: var(--font-tag), monospace;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.eyebrow::before {
+  content: "> ";
+}
+
+/* Painel com moldura e sombra dura: o "quadro" padrão da marca */
+.frame {
+  border: 1px solid var(--frame);
+  box-shadow: var(--shadow-md);
+}
+
+/* Botão principal: bloco laranja com sombra dura (texto tinta = contraste ~6,5:1).
+   Ao clicar, ele "afunda" na sombra, como botão de fliperama. */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -235,11 +273,13 @@ a {
   background: var(--accent);
   color: var(--on-accent);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   text-decoration: none;
+  box-shadow: 3px 3px 0 var(--shadow-hard);
   transition:
-    transform 160ms var(--ease-out),
+    transform 120ms var(--ease-out),
+    box-shadow 120ms var(--ease-out),
     background-color 160ms ease;
 }
 
@@ -249,15 +289,17 @@ a {
   }
 }
 
-/* Feedback de clique: o botão "afunda" um pouco */
+/* Feedback de clique: o bloco desce até a sombra */
 .btn:active {
-  transform: scale(0.97);
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--shadow-hard);
 }
 
 .btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 code {

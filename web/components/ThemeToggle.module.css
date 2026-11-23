@@ -1,39 +1,42 @@
+/* Seletor de tema. Mora na barra lateral cobalto, então usa as cores dela. */
 .toggle {
   display: inline-flex;
   gap: 2px;
   padding: 3px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-pill);
-  background: var(--surface-2);
+  background: rgb(11 14 42 / 0.22);
 }
 
 .option {
   display: grid;
   place-items: center;
-  width: 30px;
+  flex: 1;
+  min-width: 30px;
   height: 30px;
   border: 0;
-  border-radius: var(--r-pill);
   background: transparent;
-  color: var(--text-muted);
+  color: var(--side-muted);
   transition:
     background-color 160ms ease,
     color 160ms ease,
-    transform 160ms var(--ease-out);
+    transform 120ms var(--ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .option:hover {
-    color: var(--text);
+    color: var(--side-text);
   }
 }
 
 .option:active {
-  transform: scale(0.94);
+  transform: translate(1px, 1px);
 }
 
 .option[aria-checked="true"] {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
+  background: var(--side-text);
+  color: #2433ff;
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--side-text);
+  outline-offset: 1px;
 }

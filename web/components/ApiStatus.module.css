@@ -1,21 +1,22 @@
+/* Selo de conexão. Mora na barra lateral cobalto, então usa as cores dela. */
 .pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 12px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--surface-2);
+  padding: 7px 10px;
+  background: rgb(11 14 42 / 0.22);
 }
 
 .text {
-  font-size: 12px;
-  font-weight: 550;
-  color: var(--text-muted);
+  font-family: var(--font-tag), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--side-text);
   white-space: nowrap;
 }
 
-/* No celular fica só a bolinha; o texto some da tela mas o leitor de tela ainda lê */
+/* No celular fica só o quadradinho; o texto some da tela mas o leitor de tela ainda lê */
 @media (max-width: 560px) {
   .pill {
     padding: 9px;
@@ -30,20 +31,18 @@
   }
 }
 
+/* Indicador em "pixel": um quadrado, não uma bolinha */
 .dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
-  background: var(--border-strong);
+  background: var(--side-muted);
 }
 
 .pill[data-state="online"] .dot {
-  background: var(--primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+  background: var(--side-text);
 }
 
 .pill[data-state="db-down"] .dot,
 .pill[data-state="api-down"] .dot {
   background: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
 }
