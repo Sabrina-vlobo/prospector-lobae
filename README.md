@@ -28,7 +28,10 @@ _Gravado numa instância de demo com banco separado, só com os leads fictícios
 
 ## Design
 
-Interface de software, não de landing page: barra lateral com navegação, cabeçalho de página compacto, painel de métricas e tabela densa, com **tema claro e escuro**.
+Interface de software com a **identidade visual da LOBAE°**: a marca é pixel art, então a interface também é. Barra lateral cobalto com o logo oficial e a faixa de *dither* da capa, cantos retos, sombra dura (deslocada, sem desfoque), números em Silkscreen, etiquetas `> SEÇÃO` em pixel laranja e a personagem da marca no lugar do avatar genérico e nos estados vazios. Tudo em **tema claro e escuro**.
+
+- **Logo e símbolo vêm dos SVGs oficiais** (grade 10×10 / 42×10) e são desenhados como componente (`web/components/brand/LobaeLogo.tsx`), sempre em múltiplos de 10 px para cada célula virar pixels inteiros. O símbolo L° é o ícone da aba.
+- **Pixel art nunca borra:** a personagem é exibida só em escala inteira (×1, ×2...) com `image-rendering: pixelated`, regra do guia da marca.
 
 - **Tokens semânticos** (`web/app/globals.css`): os componentes usam o papel da cor (`--surface`, `--text`, `--border`, `--primary`, `--accent`), nunca o hex. Cada papel tem um valor no claro e outro no escuro, então o tema escuro é só outro conjunto de valores.
 - **Marca preservada:** Cobalto para seleção, links e foco; Laranja sinal só para ações principais e o que pede atenção; a Tinta da marca vira o fundo do tema escuro. Silkscreen fica restrita à marca e aos nomes das etapas do kanban; o resto usa Host Grotesk, mais legível em tamanhos pequenos.
