@@ -3,12 +3,15 @@
   align-items: center;
   gap: 8px;
   padding: 7px 12px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--cool-white);
+  background: var(--surface-2);
 }
 
-.pill :global(.tag) {
+.text {
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--text-muted);
   white-space: nowrap;
 }
 
@@ -17,7 +20,7 @@
   .pill {
     padding: 9px;
   }
-  .pill :global(.tag) {
+  .text {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -31,16 +34,16 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--mist);
+  background: var(--border-strong);
 }
 
 .pill[data-state="online"] .dot {
-  background: var(--cobalt);
-  box-shadow: 0 0 0 3px rgb(36 51 255 / 0.18);
+  background: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
 .pill[data-state="db-down"] .dot,
 .pill[data-state="api-down"] .dot {
-  background: var(--signal);
-  box-shadow: 0 0 0 3px rgb(255 90 31 / 0.2);
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
 }

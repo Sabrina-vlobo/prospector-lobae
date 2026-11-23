@@ -11,10 +11,10 @@
 .textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid var(--mist);
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
   background: var(--surface);
-  color: var(--ink);
+  color: var(--text);
   font: inherit;
   font-size: 16px;
   line-height: 1.5;
@@ -23,8 +23,8 @@
 
 .textarea:focus {
   outline: none;
-  border-color: var(--cobalt);
-  box-shadow: 0 0 0 3px rgb(36 51 255 / 0.15);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
 }
 
 .foot {
@@ -36,16 +36,16 @@
 
 .status {
   font-size: 13px;
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 .save {
   height: 32px;
   padding: 0 14px;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--text);
   border-radius: 999px;
   background: var(--surface);
-  color: var(--ink);
+  color: var(--text);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;

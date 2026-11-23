@@ -43,7 +43,7 @@ export function ApiStatus() {
   return (
     <span className={styles.pill} data-state={state} role="status" aria-live="polite">
       <span className={styles.dot} aria-hidden />
-      <span className="tag">{LABEL[state]}</span>
+      <span className={styles.text}>{LABEL[state]}</span>
     </span>
   );
 }

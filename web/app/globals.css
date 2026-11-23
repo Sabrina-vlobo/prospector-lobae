@@ -1,21 +1,155 @@
-/* Tokens da marca LOBAE°. Tudo no app usa essas variáveis,
-   nunca o hex solto — assim mudar a marca é mexer num lugar só. */
+/* =========================================================
+   LOBAE° Prospector: tokens de design
+
+   Os componentes NUNCA usam cor solta (#hex). Eles usam o PAPEL da cor:
+   --surface, --text, --border, --primary... Cada papel tem um valor no
+   tema claro e outro no escuro, então trocar de tema é trocar variáveis.
+
+   Marca: Cobalto #2433FF · Tinta #0B0E2A · Branco frio #F1F2F6
+          Laranja sinal #FF5A1F · Névoa #C9CEE6
+   ========================================================= */
+
 :root {
-  --cobalt: #2433ff;
-  --ink: #0b0e2a;
-  --cool-white: #f1f2f6;
-  --signal: #ff5a1f;
-  --mist: #c9cee6;
+  color-scheme: light;
 
+  /* superfícies (do fundo pra frente) */
+  --bg: #f1f2f6;
   --surface: #ffffff;
-  --ink-soft: rgb(11 14 42 / 0.62);
-  --ink-faint: rgb(11 14 42 / 0.4);
-  --line: rgb(11 14 42 / 0.09);
+  --surface-2: #f6f7fb; /* campos, chips, linhas em hover */
+  --surface-3: #eceef6; /* hover de algo que já está em surface-2 */
 
-  --radius: 16px;
-  --radius-sm: 10px;
+  /* texto */
+  --text: #0b0e2a;
+  --text-muted: rgb(11 14 42 / 0.66);
+  --text-faint: rgb(11 14 42 / 0.5);
+
+  /* bordas */
+  --border: rgb(11 14 42 / 0.08);
+  --border-strong: rgb(11 14 42 / 0.16);
+  --mist-base: #c9cee6;
+
+  /* cor principal (cobalto): links, seleção, foco */
+  --primary: #2433ff;
+  --primary-hover: #1a28e6;
+  --primary-text: #2433ff;
+  --on-primary: #ffffff;
+
+  /* destaque (laranja sinal): ações principais e o que pede atenção.
+     Texto TINTA em cima do laranja: branco daria só ~3:1 de contraste. */
+  --accent: #ff5a1f;
+  --accent-hover: #f24c10;
+  --accent-text: #c2410c;
+  --on-accent: #0b0e2a;
+
+  --danger-text: #b42318;
+  --ring: #2433ff;
+
+  /* sombras tingidas com a tinta da marca (nunca preto puro) */
+  --shadow-rgb: 11 14 42;
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-rgb) / 0.06);
+  --shadow-md: 0 6px 20px rgb(var(--shadow-rgb) / 0.08);
+  --shadow-lg: 0 24px 64px rgb(var(--shadow-rgb) / 0.22);
+  --overlay: rgb(11 14 42 / 0.42);
+
+  /* cores de cada etapa do funil */
+  --st-novo: #c9cee6;
+  --st-enviado: #8a92f5;
+  --st-respondeu: #5560ff;
+  --st-reuniao: #2433ff;
+  --st-fechou: #ff5a1f;
+  --st-descartado: #e1e4ee;
+
+  /* forma: botões e chips em pílula, cards 16px, campos 10px */
+  --r-lg: 16px;
+  --r-md: 10px;
+  --r-sm: 6px;
+  --r-pill: 999px;
+
+  /* movimento (curvas fortes: as padrão do CSS são fracas) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --sidebar-w: 248px;
 }
 
+/* ---------- tema escuro ----------
+   Vale quando: (a) o sistema está escuro e você não escolheu "claro",
+   ou (b) você escolheu "escuro" no seletor. O bloco aparece duas vezes
+   porque o CSS não deixa compartilhar regras entre um @media e um seletor. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #070920;
+    --surface: #0e1131;
+    --surface-2: #151a40;
+    --surface-3: #1c2250;
+    --text: #eef0f8;
+    --text-muted: rgb(238 240 248 / 0.7);
+    --text-faint: rgb(238 240 248 / 0.5);
+    --border: rgb(201 206 230 / 0.1);
+    --border-strong: rgb(201 206 230 / 0.2);
+    --mist-base: #3b4275;
+    --primary: #4c58ff;
+    --primary-hover: #616cff;
+    --primary-text: #9aa1ff;
+    --on-primary: #ffffff;
+    --accent: #ff6a33;
+    --accent-hover: #ff7c4d;
+    --accent-text: #ff9466;
+    --on-accent: #0b0e2a;
+    --danger-text: #ff8a80;
+    --ring: #9aa1ff;
+    --shadow-rgb: 0 0 0;
+    --shadow-sm: 0 1px 2px rgb(var(--shadow-rgb) / 0.4);
+    --shadow-md: 0 8px 24px rgb(var(--shadow-rgb) / 0.35);
+    --shadow-lg: 0 24px 64px rgb(var(--shadow-rgb) / 0.6);
+    --overlay: rgb(3 4 15 / 0.62);
+    --st-novo: #4a5185;
+    --st-enviado: #7a83f2;
+    --st-respondeu: #5c67ff;
+    --st-reuniao: #3a47ff;
+    --st-fechou: #ff6a33;
+    --st-descartado: #2b3160;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #070920;
+  --surface: #0e1131;
+  --surface-2: #151a40;
+  --surface-3: #1c2250;
+  --text: #eef0f8;
+  --text-muted: rgb(238 240 248 / 0.7);
+  --text-faint: rgb(238 240 248 / 0.5);
+  --border: rgb(201 206 230 / 0.1);
+  --border-strong: rgb(201 206 230 / 0.2);
+  --mist-base: #3b4275;
+  --primary: #4c58ff;
+  --primary-hover: #616cff;
+  --primary-text: #9aa1ff;
+  --on-primary: #ffffff;
+  --accent: #ff6a33;
+  --accent-hover: #ff7c4d;
+  --accent-text: #ff9466;
+  --on-accent: #0b0e2a;
+  --danger-text: #ff8a80;
+  --ring: #9aa1ff;
+  --shadow-rgb: 0 0 0;
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-rgb) / 0.4);
+  --shadow-md: 0 8px 24px rgb(var(--shadow-rgb) / 0.35);
+  --shadow-lg: 0 24px 64px rgb(var(--shadow-rgb) / 0.6);
+  --overlay: rgb(3 4 15 / 0.62);
+  --st-novo: #4a5185;
+  --st-enviado: #7a83f2;
+  --st-respondeu: #5c67ff;
+  --st-reuniao: #3a47ff;
+  --st-fechou: #ff6a33;
+  --st-descartado: #2b3160;
+}
+
+/* ---------- base ---------- */
 *,
 *::before,
 *::after {
@@ -28,74 +162,111 @@ html {
 
 body {
   margin: 0;
-  background: var(--cool-white);
-  color: var(--ink);
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--font-text), system-ui, sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01";
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
 }
 
 button {
-  font: inherit;
+  cursor: pointer;
 }
 
-/* Casca do app: cabeçalho em cima, página embaixo ocupando o resto */
-.app-shell {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+a {
+  color: var(--primary-text);
 }
 
-/* Etiqueta pixelada (Silkscreen) — só pra textos curtos em caixa alta. */
+::selection {
+  background: color-mix(in srgb, var(--primary) 24%, transparent);
+}
+
+/* Foco visível e igual no app inteiro (só pra teclado: :focus-visible) */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Rótulo de campo/seção: legível, discreto (o padrão do app) */
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.2;
+  color: var(--text-muted);
+}
+
+/* Etiqueta pixelada (Silkscreen): SÓ pra marca e nomes de etapa no kanban. */
 .tag {
   font-family: var(--font-tag), monospace;
   font-size: 11px;
   line-height: 1;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--text-muted);
 }
 
 .tag--cobalt {
-  color: var(--cobalt);
+  color: var(--primary-text);
 }
 
-/* Botão de ação principal: Laranja sinal */
+/* Botão principal: Laranja sinal (texto tinta = contraste ~6,5:1) */
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 10px 18px;
+  min-height: 40px;
+  padding: 0 18px;
   border: 0;
-  border-radius: 999px;
-  background: var(--signal);
-  color: #fff;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
-  transition: transform 160ms ease-out, filter 160ms ease-out;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 160ms ease;
 }
 
-.btn:hover {
-  filter: brightness(1.06);
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    background: var(--accent-hover);
+  }
 }
 
+/* Feedback de clique: o botão "afunda" um pouco */
 .btn:active {
   transform: scale(0.97);
 }
 
-.btn:focus-visible {
-  outline: 2px solid var(--cobalt);
-  outline-offset: 3px;
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
 }
 
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.9em;
+  font-size: 0.88em;
   padding: 2px 6px;
-  border-radius: 6px;
-  background: rgb(36 51 255 / 0.08);
-  color: var(--cobalt);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary-text);
 }
 
 /* Some da tela, mas leitores de tela continuam lendo (acessibilidade). */
@@ -109,4 +280,15 @@ code {
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Quem prefere menos movimento: sem deslocamentos, só mudanças rápidas */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
 }

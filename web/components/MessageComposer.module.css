@@ -16,7 +16,7 @@
   border: 0;
   background: none;
   padding: 0;
-  color: var(--cobalt);
+  color: var(--primary-text);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -32,23 +32,23 @@
 .option {
   height: 34px;
   padding: 0 14px;
-  border: 1px solid var(--mist);
+  border: 1px solid var(--border-strong);
   border-radius: 999px;
   background: var(--surface);
-  color: var(--ink-soft);
+  color: var(--text-muted);
   font-size: 13px;
   cursor: pointer;
   transition: background 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
 }
 
 .option[aria-checked="true"] {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: #fff;
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--surface);
 }
 
 .option:focus-visible {
-  outline: 2px solid var(--cobalt);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
@@ -60,10 +60,10 @@
 .textarea {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid var(--mist);
+  border: 1px solid var(--border-strong);
   border-radius: 14px 14px 14px 4px; /* "balão" de conversa */
   background: var(--surface);
-  color: var(--ink);
+  color: var(--text);
   font: inherit;
   font-size: 16px; /* evita zoom automático no iPhone */
   line-height: 1.5;
@@ -72,8 +72,8 @@
 
 .textarea:focus {
   outline: none;
-  border-color: var(--cobalt);
-  box-shadow: 0 0 0 3px rgb(36 51 255 / 0.15);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
 }
 
 /* ---------- rodapé ---------- */
@@ -87,7 +87,7 @@
 
 .counter {
   font-size: 13px;
-  color: var(--ink-faint);
+  color: var(--text-faint);
   font-variant-numeric: tabular-nums;
 }
 
@@ -109,27 +109,27 @@
 }
 
 .hint {
-  color: var(--ink-soft);
+  color: var(--text-muted);
 }
 
 .error {
-  color: #b33a0c;
+  color: var(--accent-text);
 }
 
 .sent {
   padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  background: rgb(36 51 255 / 0.07);
-  color: var(--cobalt);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+  color: var(--primary-text);
   font-weight: 600;
 }
 
 /* Mensagem anterior (no follow-up): fica recolhida, abre com um clique */
 .previous {
-  border-radius: var(--radius-sm);
-  background: rgb(11 14 42 / 0.04);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
   font-size: 13px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
 }
 
 .previous summary {

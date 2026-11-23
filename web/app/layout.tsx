@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Host_Grotesk, Silkscreen } from "next/font/google";
-import { AppHeader } from "@/components/AppHeader";
+import { AppShell } from "@/components/AppShell";
+import { themeBootScript } from "@/lib/theme";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -24,15 +25,25 @@ export const metadata: Metadata = {
   description: "Prospecção de pequenos negócios sem site, com primeiro contato pelo WhatsApp.",
 };
 
+// Cor da barra do navegador no celular acompanha o tema
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f1f2f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#070920" },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${hostGrotesk.variable} ${silkscreen.variable}`}>
+    // suppressHydrationWarning: o script abaixo muda o data-theme do <html> antes do React,
+    // e isso é de propósito (sem ele, o React reclamaria que o HTML "mudou").
+    <html lang="pt-BR" className={`${hostGrotesk.variable} ${silkscreen.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body>
         <Providers>
-          <div className="app-shell">
-            <AppHeader />
-            {children}
-          </div>
+          <AppShell>{children}</AppShell>
         </Providers>
       </body>
     </html>
