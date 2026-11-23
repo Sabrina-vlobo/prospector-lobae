@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  OPT_OUT_LINE,
+  CLOSING_LINE,
   SIGNATURE,
   buildFollowupOptions,
   buildMessageOptions,
@@ -19,13 +19,13 @@ const base = {
 };
 
 describe("buildMessageOptions", () => {
-  it("gera os 3 modelos, todos com o nome, assinatura e linha de saída", () => {
+  it("gera os 3 modelos, todos com o nome, assinatura e frase final", () => {
     const options = buildMessageOptions(base);
 
     expect(options.map((o) => o.id)).toEqual(["direta", "elogio", "curta"]);
     for (const option of options) {
       expect(option.text).toContain("Barbearia Exemplo");
-      expect(option.text.endsWith(`${SIGNATURE}\n${OPT_OUT_LINE}`)).toBe(true);
+      expect(option.text.endsWith(`${SIGNATURE}\n${CLOSING_LINE}`)).toBe(true);
     }
   });
 
@@ -111,9 +111,9 @@ describe("buildFollowupOptions", () => {
     expect(followups.map((f) => f.scheduleFollowup ?? true)).toEqual([true, true, false]);
   });
 
-  it("os dois primeiros mantêm a linha de saída", () => {
-    expect(followups[0]!.text.endsWith(OPT_OUT_LINE)).toBe(true);
-    expect(followups[1]!.text.endsWith(OPT_OUT_LINE)).toBe(true);
+  it("os dois primeiros terminam com a frase final", () => {
+    expect(followups[0]!.text.endsWith(CLOSING_LINE)).toBe(true);
+    expect(followups[1]!.text.endsWith(CLOSING_LINE)).toBe(true);
   });
 });
 

@@ -4,7 +4,8 @@ import type { Lead } from "./types";
 // Cada modelo é uma função pura (lead → texto), fácil de testar e de ajustar.
 
 export const SIGNATURE = "Sabrina, da LOBAE";
-export const OPT_OUT_LINE = "Se não fizer sentido, é só me avisar que não mando mais.";
+/** Frase final: convida a pessoa a chamar quando quiser (sem pressão). */
+export const CLOSING_LINE = "Qualquer coisa, é só me chamar por aqui.";
 
 export type TemplateId =
   | "direta"
@@ -75,7 +76,7 @@ function benefitPhrase(lead: LeadForMessage): string {
 }
 
 function withSignature(body: string): string {
-  return `${body}\n\n${SIGNATURE}\n${OPT_OUT_LINE}`;
+  return `${body}\n\n${SIGNATURE}\n${CLOSING_LINE}`;
 }
 
 // ---------- primeiro contato ----------

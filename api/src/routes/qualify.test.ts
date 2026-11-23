@@ -85,10 +85,10 @@ describe("POST /leads/:id/qualify", () => {
     expect(prompt).toContain("nunca sei se está aberto");
     expect(prompt).not.toContain("Fulano");
 
-    // Banco: salvou o resultado, com assinatura e linha de saída garantidas
+    // Banco: salvou o resultado, com assinatura e frase final garantidas
     const { data } = vi.mocked(prisma.lead.update).mock.calls[0]![0];
     expect(data).toMatchObject({ score: 85, hook: goodAnswer.hook });
-    expect(data.message).toMatch(/Sabrina, da LOBAE\nSe não fizer sentido, é só me avisar que não mando mais\.$/);
+    expect(data.message).toMatch(/Sabrina, da LOBAE\nQualquer coisa, é só me chamar por aqui\.$/);
   });
 
   it("não gasta chamada ao Google com lead de demo ou sem avaliações", async () => {

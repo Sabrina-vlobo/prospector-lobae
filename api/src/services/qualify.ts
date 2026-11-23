@@ -4,7 +4,7 @@ import { askClaudeForQualification, ensureClaudeConfigured } from "../lib/claude
 import { HttpError } from "../lib/errors.js";
 import { getPlaceReviews, type Review } from "../lib/googlePlaces.js";
 import { prisma } from "../lib/prisma.js";
-import { buildUserPrompt, ensureSignatureAndOptOut, QualificationSchema } from "../lib/qualifyPrompt.js";
+import { buildUserPrompt, ensureSignatureAndClosing, QualificationSchema } from "../lib/qualifyPrompt.js";
 import { ANTHROPIC, GOOGLE_PLACE_DETAILS, reserveCall } from "../lib/quota.js";
 
 /** Lead de demo (seed) não existe no Google: não dá pra buscar avaliações dele. */
@@ -47,7 +47,7 @@ export async function qualifyLead(id: string): Promise<Lead> {
 
   return prisma.lead.update({
     where: { id },
-    data: { score, scoreReason, hook, message: ensureSignatureAndOptOut(message) },
+    data: { score, scoreReason, hook, message: ensureSignatureAndClosing(message) },
   });
 }
 

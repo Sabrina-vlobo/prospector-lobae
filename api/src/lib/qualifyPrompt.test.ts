@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-  OPT_OUT_LINE,
+  CLOSING_LINE,
   QualificationSchema,
   SIGNATURE,
   buildUserPrompt,
-  ensureSignatureAndOptOut,
+  ensureSignatureAndClosing,
   type LeadForPrompt,
 } from "./qualifyPrompt.js";
 
@@ -48,25 +48,25 @@ describe("buildUserPrompt", () => {
   });
 });
 
-describe("ensureSignatureAndOptOut", () => {
+describe("ensureSignatureAndClosing", () => {
   it("não mexe na mensagem que já está completa", () => {
-    const ok = `Oi! Tudo bem?\n\n${SIGNATURE}\n${OPT_OUT_LINE}`;
-    expect(ensureSignatureAndOptOut(ok)).toBe(ok);
+    const ok = `Oi! Tudo bem?\n\n${SIGNATURE}\n${CLOSING_LINE}`;
+    expect(ensureSignatureAndClosing(ok)).toBe(ok);
   });
 
-  it("completa assinatura e linha de saída quando a IA esquece", () => {
-    const fixed = ensureSignatureAndOptOut("Oi! Vi que vocês só têm Instagram.");
-    expect(fixed).toBe(`Oi! Vi que vocês só têm Instagram.\n\n${SIGNATURE}\n${OPT_OUT_LINE}`);
+  it("completa assinatura e frase final quando a IA esquece", () => {
+    const fixed = ensureSignatureAndClosing("Oi! Vi que vocês só têm Instagram.");
+    expect(fixed).toBe(`Oi! Vi que vocês só têm Instagram.\n\n${SIGNATURE}\n${CLOSING_LINE}`);
   });
 
-  it("aceita a linha de saída com ou sem acento", () => {
-    const msg = "Oi!\n— Sabrina, da LOBAE\nSe nao fizer sentido, e so me avisar que nao mando mais.";
-    expect(ensureSignatureAndOptOut(msg)).toBe(msg);
+  it("aceita a frase final com ou sem acento", () => {
+    const msg = "Oi!\n— Sabrina, da LOBAE\nQualquer coisa, e so me chamar por aqui.";
+    expect(ensureSignatureAndClosing(msg)).toBe(msg);
   });
 
-  it("coloca a assinatura antes da linha de saída se só ela faltar", () => {
-    const fixed = ensureSignatureAndOptOut(`Oi! Tudo bem?\n${OPT_OUT_LINE}`);
-    expect(fixed).toBe(`Oi! Tudo bem?\n\n${SIGNATURE}\n${OPT_OUT_LINE}`);
+  it("coloca a assinatura antes da frase final se só ela faltar", () => {
+    const fixed = ensureSignatureAndClosing(`Oi! Tudo bem?\n${CLOSING_LINE}`);
+    expect(fixed).toBe(`Oi! Tudo bem?\n\n${SIGNATURE}\n${CLOSING_LINE}`);
   });
 });
 
