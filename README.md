@@ -26,6 +26,16 @@ O Prospector automatiza a parte chata e deixa a parte humana com quem prospecta:
 
 _Gravado numa instância de demo com banco separado, só com os leads fictícios do seed (telefones com DDD 00, por isso o botão do WhatsApp aparece desativado). A resposta da busca no Google foi simulada na gravação, para não chamar a API nem gravar negócios reais._
 
+## Design
+
+Interface de software, não de landing page: barra lateral com navegação, cabeçalho de página compacto, painel de métricas e tabela densa, com **tema claro e escuro**.
+
+- **Tokens semânticos** (`web/app/globals.css`): os componentes usam o papel da cor (`--surface`, `--text`, `--border`, `--primary`, `--accent`), nunca o hex. Cada papel tem um valor no claro e outro no escuro, então o tema escuro é só outro conjunto de valores.
+- **Marca preservada:** Cobalto para seleção, links e foco; Laranja sinal só para ações principais e o que pede atenção; a Tinta da marca vira o fundo do tema escuro. Silkscreen fica restrita à marca e aos nomes das etapas do kanban; o resto usa Host Grotesk, mais legível em tamanhos pequenos.
+- **Tema:** segue o sistema por padrão, com seletor claro / sistema / escuro na barra lateral. A escolha fica salva no navegador e um script no `<head>` aplica o tema antes da primeira pintura, então não há "flash" branco.
+- **Acessibilidade:** texto branco sobre o laranja da marca dá só ~3:1 de contraste (abaixo dos 4,5:1 do WCAG AA), por isso os botões laranja usam texto tinta (~6,5:1). Foco visível igual no app inteiro (`:focus-visible`), rótulos acima dos campos e `prefers-reduced-motion` respeitado.
+- **Movimento com propósito:** curvas de easing próprias, botões que "afundam" levemente ao clicar (`scale(0.97)`), painel lateral entrando com curva de gaveta e cards do kanban que mudam de coluna na hora (atualização otimista).
+
 ## Arquitetura
 
 ```mermaid
@@ -46,7 +56,7 @@ flowchart LR
 
 | Camada | Tecnologias |
 | --- | --- |
-| Front | Next.js 16, React 19, TypeScript, TanStack Query, CSS Modules, `next/font` (Host Grotesk + Silkscreen) |
+| Front | Next.js 16, React 19, TypeScript, TanStack Query, CSS Modules com tokens (tema claro/escuro), ícones Phosphor, `next/font` (Host Grotesk + Silkscreen) |
 | API | Node 22, Express 5, TypeScript, zod, Prisma 7 (driver adapter `pg`) |
 | Banco | PostgreSQL 17 (docker-compose) |
 | Testes | Vitest (API e web) + Supertest |
