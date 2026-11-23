@@ -23,6 +23,7 @@ O Prospector automatiza a parte chata e deixa a parte humana com quem prospecta:
 1. **Visão geral:** busca "barbearia" em "Mogi das Cruzes" e mostra quantos não têm site.
 2. **Leads:** filtra por nota e abre o **Contatar**, alternando entre os modelos de mensagem.
 3. **Funil:** follow-up do dia, card arrastado de "Enviado" para "Respondeu" e o painel lateral com as sugestões de follow-up.
+4. **Tema escuro:** o seletor da barra lateral troca o app inteiro para o tema escuro.
 
 _Gravado numa instância de demo com banco separado, só com os leads fictícios do seed (telefones com DDD 00, por isso o botão do WhatsApp aparece desativado). A resposta da busca no Google foi simulada na gravação, para não chamar a API nem gravar negócios reais._
 
