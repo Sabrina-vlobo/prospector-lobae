@@ -1,24 +1,40 @@
-.overview {
+/* Um painel só: total, barra do funil e as 6 etapas separadas por linhas finas */
+.panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
+  padding: 22px 22px 0;
+  /* esconde as linhas finas da última coluna/linha, que encostariam na borda */
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
-/* ---------- total ---------- */
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.total {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+}
+
 .totalNumber {
-  display: block;
-  font-size: clamp(64px, 10vw, 104px);
-  line-height: 0.9;
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  color: var(--cobalt);
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 750;
+  letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
 }
 
 .totalLabel {
-  display: block;
-  margin-top: 8px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
   font-weight: 500;
 }
 
@@ -26,8 +42,8 @@
 .funnel {
   display: flex;
   gap: 3px;
-  height: 14px;
-  border-radius: 999px;
+  height: 10px;
+  border-radius: var(--r-pill);
   overflow: hidden;
 }
 
@@ -36,131 +52,140 @@
   min-width: 6px;
 }
 
-/* ---------- cards ---------- */
-.grid {
+/* ---------- as 6 etapas ---------- */
+.stats {
   list-style: none;
-  margin: 0;
+  margin: 0 -23px -1px -22px;
   padding: 0;
   display: grid;
-  /* 6 status: 1 coluna no celular, 2 no meio, 3x2 em telas largas */
-  grid-template-columns: 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 1px solid var(--border);
 }
 
-@media (min-width: 480px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 760px) {
-  .grid {
+@media (min-width: 640px) {
+  .stats {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-.card {
+@media (min-width: 1100px) {
+  .stats {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.stat {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 18px 18px 16px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--line);
+  gap: 6px;
+  padding: 16px 22px 18px;
+  /* linhas finas entre as células (em vez de 6 cards soltos) */
+  box-shadow:
+    inset -1px 0 0 var(--border),
+    inset 0 -1px 0 var(--border);
 }
 
-.card[data-status="FECHOU"] {
-  border-color: rgb(255 90 31 / 0.35);
-}
-
-.cardHead {
+.statLabel {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
 .swatch {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
-  box-shadow: inset 0 0 0 1px rgb(11 14 42 / 0.08);
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
 }
 
 .count {
-  font-size: 44px;
-  line-height: 1;
+  font-size: 28px;
+  line-height: 1.1;
   font-weight: 700;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
 
-.card[data-status="FECHOU"] .count {
-  color: var(--signal);
-}
-
-.cardFoot {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--ink-soft);
+.stat[data-status="FECHOU"] .count {
+  color: var(--accent-text);
 }
 
 .share {
+  font-size: 12px;
+  color: var(--text-faint);
   font-variant-numeric: tabular-nums;
-  color: var(--ink-faint);
 }
 
 /* ---------- estados: erro / vazio ---------- */
 .notice {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 28px;
-  border-radius: var(--radius);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-lg);
   background: var(--surface);
-  border: 1px dashed var(--mist);
+}
+
+.noticeIcon {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.noticeBody {
+  flex: 1;
+  min-width: 220px;
 }
 
 .noticeTitle {
-  margin: 4px 0 0;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.015em;
+  margin: 0;
+  font-weight: 650;
 }
 
 .noticeText {
-  margin: 0 0 8px;
-  color: var(--ink-soft);
-  max-width: 56ch;
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
-/* ---------- skeleton ---------- */
+/* ---------- carregando (mesmo formato do painel pronto) ---------- */
+.loading {
+  padding-bottom: 22px;
+}
+
+.loading .stats {
+  margin: 0;
+  gap: 12px;
+  border: 0;
+}
+
 .skeleton {
-  border-radius: var(--radius);
+  border-radius: var(--r-md);
   background: linear-gradient(
     90deg,
-    rgb(201 206 230 / 0.35),
-    rgb(201 206 230 / 0.6),
-    rgb(201 206 230 / 0.35)
+    color-mix(in srgb, var(--mist-base) 30%, transparent),
+    color-mix(in srgb, var(--mist-base) 55%, transparent),
+    color-mix(in srgb, var(--mist-base) 30%, transparent)
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
 .skeletonTotal {
-  width: 180px;
-  height: 104px;
+  width: 200px;
+  height: 40px;
 }
 
 .skeletonBar {
-  height: 14px;
-  border-radius: 999px;
+  height: 10px;
+  border-radius: var(--r-pill);
 }
 
-.skeletonCard {
-  height: 132px;
+.skeletonStat {
+  height: 72px;
 }
 
 @keyframes shimmer {
@@ -169,11 +194,5 @@
   }
   to {
     background-position: -100% 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skeleton {
-    animation: none;
   }
 }

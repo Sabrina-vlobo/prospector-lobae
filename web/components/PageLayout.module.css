@@ -1,31 +1,71 @@
-/* Estrutura comum das páginas (miolo, introdução e título). */
+/* Estrutura comum das páginas: miolo + cabeçalho compacto (título, descrição, ações). */
 .main {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: clamp(28px, 6vw, 64px) clamp(16px, 4vw, 48px) 64px;
+  padding: 24px 16px 64px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 24px;
 }
 
-.intro {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+@media (min-width: 768px) {
+  .main {
+    padding: 32px 32px 72px;
+  }
 }
 
-.title {
-  margin: 0;
-  max-width: 22ch;
-  font-size: clamp(28px, 4.2vw, 44px);
-  line-height: 1.08;
-  letter-spacing: -0.025em;
-  font-weight: 700;
-  text-wrap: balance;
+@media (min-width: 1280px) {
+  .main {
+    padding: 40px 48px 80px;
+  }
 }
 
 /* Páginas que precisam de mais largura (o kanban tem 6 colunas) */
 .wide {
-  max-width: 1440px;
+  max-width: 1480px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 28px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+.description {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Título de seção dentro da página (ex: "Buscar negócios", "Follow-ups de hoje") */
+.sectionTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
 }

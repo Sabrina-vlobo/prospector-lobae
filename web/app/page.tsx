@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/PageHeader";
 import { SearchForm } from "@/components/SearchForm";
 import { StatusOverview } from "@/components/StatusOverview";
 import styles from "@/components/PageLayout.module.css";
@@ -7,14 +8,12 @@ import styles from "@/components/PageLayout.module.css";
 export default function HomePage() {
   return (
     <main className={styles.main}>
-      <section className={styles.intro}>
-        <span className="tag tag--cobalt">Funil · visão geral</span>
-        <h1 className={styles.title}>Quem já entrou no radar e em que pé está cada conversa.</h1>
-      </section>
-
-      <SearchForm />
-
+      <PageHeader
+        title="Visão geral"
+        description="Quantos negócios estão em cada etapa e uma busca rápida pra trazer novos."
+      />
       <StatusOverview />
+      <SearchForm />
     </main>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LeadsTable } from "@/components/LeadsTable";
+import { PageHeader } from "@/components/PageHeader";
 import styles from "@/components/PageLayout.module.css";
 
 export const metadata: Metadata = { title: "Leads · LOBAE° Prospector" };
@@ -8,11 +9,10 @@ export const metadata: Metadata = { title: "Leads · LOBAE° Prospector" };
 export default function LeadsPage() {
   return (
     <main className={styles.main}>
-      <section className={styles.intro}>
-        <span className="tag tag--cobalt">Leads</span>
-        <h1 className={styles.title}>Quem vale a pena chamar primeiro.</h1>
-      </section>
-
+      <PageHeader
+        title="Leads"
+        description="Filtre quem vale a pena chamar primeiro e monte a mensagem de contato."
+      />
       <LeadsTable />
     </main>
   );
