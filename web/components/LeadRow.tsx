@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowSquareOut, CaretDown, CaretUp, ChatCircleText, MapPin, Sparkle } from "@phosphor-icons/react";
 import { STATUS_META } from "@/lib/status";
 import { LEAD_STATUSES, type Lead, type LeadStatus } from "@/lib/types";
 import { MessageComposer } from "./MessageComposer";
@@ -100,6 +101,7 @@ export function LeadRow({
                 onClick={onQualify}
                 disabled={qualifying}
               >
+                <Sparkle size={14} weight="fill" aria-hidden />
                 {qualifying ? "Qualificando…" : lead.score != null ? "Requalificar" : "Qualificar"}
               </button>
             )}
@@ -110,7 +112,15 @@ export function LeadRow({
               aria-expanded={expanded}
               aria-controls={detailsId}
             >
-              {expanded ? "Fechar ▴" : "Contatar ▾"}
+              {expanded ? (
+                <>
+                  Fechar <CaretUp size={14} weight="bold" aria-hidden />
+                </>
+              ) : (
+                <>
+                  <ChatCircleText size={16} aria-hidden /> Contatar <CaretDown size={14} weight="bold" aria-hidden />
+                </>
+              )}
             </button>
           </div>
         </td>
@@ -140,7 +150,7 @@ function LeadDetails({ lead }: { lead: Lead }) {
     <div className={styles.details}>
       <div className={styles.detailsCol}>
         <div>
-          <span className="tag">Contato</span>
+          <span className="label">Contato</span>
           <p className={styles.detailsText}>{lead.phone ?? "Sem telefone no Google"}</p>
           {lead.address && <p className={styles.detailsSub}>{lead.address}</p>}
         </div>
@@ -148,12 +158,12 @@ function LeadDetails({ lead }: { lead: Lead }) {
         <div className={styles.contactLine}>
           {lead.mapsUrl && (
             <a className={styles.mapsLink} href={lead.mapsUrl} target="_blank" rel="noreferrer">
-              Ver no Maps ↗
+              <MapPin size={14} aria-hidden /> Ver no Maps
             </a>
           )}
           {lead.website && (
             <a className={styles.mapsLink} href={lead.website} target="_blank" rel="noreferrer">
-              Ver rede/site ↗
+              <ArrowSquareOut size={14} aria-hidden /> Ver rede/site
             </a>
           )}
         </div>
@@ -163,13 +173,13 @@ function LeadDetails({ lead }: { lead: Lead }) {
         {/* Só aparece se o lead foi qualificado pela IA em algum momento */}
         {lead.hook && (
           <div>
-            <span className="tag tag--cobalt">Gancho (IA)</span>
+            <span className="label">Gancho (IA)</span>
             <p className={styles.detailsText}>{lead.hook}</p>
           </div>
         )}
         {lead.scoreReason && (
           <div>
-            <span className="tag">Por que essa nota (IA)</span>
+            <span className="label">Por que essa nota (IA)</span>
             <p className={styles.detailsText}>{lead.scoreReason}</p>
           </div>
         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { MagnifyingGlass, Sparkle } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { apiGet, apiPost } from "@/lib/api";
 import { changeLeadStatus } from "@/lib/leadActions";
@@ -185,18 +186,21 @@ export function LeadsTable() {
       {/* ---------- filtros ---------- */}
       <div className={styles.filters}>
         <label className={`${styles.field} ${styles.fieldSearch}`}>
-          <span className="tag">Buscar por nome</span>
+          <span className="label">Buscar por nome</span>
+          <span className={styles.searchWrap}>
+            <MagnifyingGlass size={16} className={styles.searchIcon} aria-hidden />
           <input
-            className={styles.input}
+            className={`${styles.input} ${styles.searchInput}`}
             type="search"
             value={filters.q}
             onChange={(e) => update("q", e.target.value)}
             placeholder="ex: navalha"
           />
+          </span>
         </label>
 
         <fieldset className={`${styles.field} ${styles.fieldWide}`}>
-          <legend className="tag">Site</legend>
+          <legend className="label">Site</legend>
           <div className={styles.toggles}>
             {WEBSITE_OPTIONS.map((opt) => (
               <button
@@ -213,7 +217,7 @@ export function LeadsTable() {
         </fieldset>
 
         <label className={styles.field}>
-          <span className="tag">Status</span>
+          <span className="label">Status</span>
           <select
             className={styles.input}
             value={filters.status}
@@ -229,7 +233,7 @@ export function LeadsTable() {
         </label>
 
         <label className={styles.field}>
-          <span className="tag">Nota mínima</span>
+          <span className="label">Nota mínima</span>
           <select
             className={styles.input}
             value={filters.minRating}
@@ -243,7 +247,7 @@ export function LeadsTable() {
         </label>
 
         <label className={styles.field}>
-          <span className="tag">Mín. avaliações</span>
+          <span className="label">Mín. avaliações</span>
           <select
             className={styles.input}
             value={filters.minReviews}
@@ -257,7 +261,7 @@ export function LeadsTable() {
         </label>
 
         <label className={styles.field}>
-          <span className="tag">Ordenar</span>
+          <span className="label">Ordenar</span>
           <select
             className={styles.input}
             value={filters.sort}
@@ -313,6 +317,7 @@ export function LeadsTable() {
               disabled={tooMany || qualifyBatch.isPending}
               onClick={() => qualifyBatch.mutate([...selected])}
             >
+              <Sparkle size={16} weight="fill" aria-hidden />
               {qualifyBatch.isPending ? `Qualificando ${selected.size}…` : "Qualificar selecionados"}
             </button>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { BellRinging, ChatCircleText } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
 import { followupLabel, shortDate } from "@/lib/dates";
@@ -25,9 +26,9 @@ export function FollowupsToday({ onOpenLead }: { onOpenLead: (id: string) => voi
   return (
     <section className={styles.card} aria-labelledby="followups-title">
       <div className={styles.head}>
-        <span className="tag tag--cobalt">Hoje</span>
         <h2 id="followups-title" className={styles.title}>
-          Follow-ups pra fazer {data && data.total > 0 && <span className={styles.badge}>{data.total}</span>}
+          <BellRinging size={18} weight="fill" className={styles.titleIcon} aria-hidden />
+          Follow-ups de hoje {data && data.total > 0 && <span className={styles.badge}>{data.total}</span>}
         </h2>
       </div>
 
@@ -53,6 +54,7 @@ export function FollowupsToday({ onOpenLead }: { onOpenLead: (id: string) => voi
                   </span>
                 </div>
                 <button type="button" className="btn" onClick={() => onOpenLead(lead.id)}>
+                  <ChatCircleText size={16} aria-hidden />
                   Fazer follow-up
                 </button>
               </li>

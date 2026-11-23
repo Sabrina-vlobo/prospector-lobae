@@ -1,5 +1,6 @@
 "use client";
 
+import { WhatsappLogo } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { apiPost } from "@/lib/api";
@@ -77,7 +78,7 @@ export function MessageComposer({ lead }: { lead: Lead }) {
   return (
     <div className={styles.composer}>
       <div className={styles.head}>
-        <span className="tag">{TITLES[mode]}</span>
+        <span className="label">{TITLES[mode]}</span>
         {edited && selected && (
           <button type="button" className={styles.reset} onClick={() => setText(selected.text)}>
             Voltar ao modelo
@@ -133,10 +134,12 @@ export function MessageComposer({ lead }: { lead: Lead }) {
           // Conversa já andando: só abre o WhatsApp, sem mexer no status
           phone ? (
             <a className={`btn ${styles.whatsapp}`} href={whatsappLink(phone, text.trim())} target="_blank" rel="noreferrer">
+              <WhatsappLogo size={18} weight="fill" aria-hidden />
               Abrir conversa no WhatsApp
             </a>
           ) : (
             <button type="button" className={`btn ${styles.whatsapp}`} disabled>
+              <WhatsappLogo size={18} weight="fill" aria-hidden />
               Abrir conversa no WhatsApp
             </button>
           )
@@ -150,10 +153,12 @@ export function MessageComposer({ lead }: { lead: Lead }) {
             rel="noreferrer"
             onClick={() => contacted.mutate()}
           >
+            <WhatsappLogo size={18} weight="fill" aria-hidden />
             Abrir no WhatsApp
           </a>
         ) : (
           <button type="button" className={`btn ${styles.whatsapp}`} disabled>
+            <WhatsappLogo size={18} weight="fill" aria-hidden />
             Abrir no WhatsApp
           </button>
         )}

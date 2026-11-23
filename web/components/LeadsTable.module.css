@@ -10,9 +10,9 @@
   grid-template-columns: 1fr;
   gap: 14px;
   padding: 20px;
-  border-radius: var(--radius);
+  border-radius: var(--r-lg);
   background: var(--surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
 }
 
 @media (min-width: 640px) {
@@ -51,18 +51,18 @@
   width: 100%;
   height: 42px;
   padding: 0 12px;
-  border: 1px solid var(--mist);
-  border-radius: var(--radius-sm);
-  background: var(--cool-white);
-  color: var(--ink);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text);
   font: inherit;
   font-size: 16px;
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--cobalt);
-  box-shadow: 0 0 0 3px rgb(36 51 255 / 0.15);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
   background: var(--surface);
 }
 
@@ -75,23 +75,23 @@
 .toggle {
   height: 42px;
   padding: 0 12px;
-  border: 1px solid var(--mist);
+  border: 1px solid var(--border-strong);
   border-radius: 999px;
   background: var(--surface);
-  color: var(--ink-soft);
+  color: var(--text-muted);
   font-size: 14px;
   cursor: pointer;
   transition: background 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
 }
 
 .toggle[aria-pressed="true"] {
-  border-color: var(--cobalt);
-  background: var(--cobalt);
-  color: #fff;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .toggle:focus-visible {
-  outline: 2px solid var(--cobalt);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
@@ -102,23 +102,23 @@
   align-items: center;
   gap: 12px;
   padding: 0 4px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
 }
 
 .summary strong {
-  color: var(--ink);
+  color: var(--text);
   font-variant-numeric: tabular-nums;
 }
 
 .updating {
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 .linkButton {
   border: 0;
   background: none;
   padding: 4px 0;
-  color: var(--cobalt);
+  color: var(--primary-text);
   font-weight: 600;
   cursor: pointer;
 }
@@ -127,9 +127,9 @@
 /* Em tela pequena a tabela rola na horizontal dentro do card, sem estourar a página */
 .tableScroll {
   overflow-x: auto;
-  border-radius: var(--radius);
+  border-radius: var(--r-lg);
   background: var(--surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
 }
 
 .table {
@@ -147,14 +147,14 @@
   font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ink-soft);
-  border-bottom: 1px solid var(--line);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
 
 .table td {
   padding: 14px 16px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
@@ -163,7 +163,7 @@
 }
 
 .table tbody tr:hover {
-  background: rgb(241 242 246 / 0.6);
+  background: var(--surface-2);
 }
 
 .num {
@@ -173,14 +173,14 @@
 
 .name {
   font-weight: 600;
-  color: var(--ink);
+  color: var(--text);
 }
 
 .address {
   margin-top: 2px;
   max-width: 34ch;
   font-size: 13px;
-  color: var(--ink-faint);
+  color: var(--text-faint);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -195,7 +195,7 @@
 .reviews {
   display: block;
   font-size: 12px;
-  color: var(--ink-faint);
+  color: var(--text-faint);
   font-variant-numeric: tabular-nums;
 }
 
@@ -205,7 +205,7 @@
 }
 
 .muted {
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 /* ---------- selos de site ---------- */
@@ -223,19 +223,19 @@
 }
 
 .badgeNone {
-  background: rgb(255 90 31 / 0.12);
-  color: #b33a0c;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
 .badgeSocial {
-  background: rgb(36 51 255 / 0.08);
-  color: var(--cobalt);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  color: var(--primary-text);
 }
 
 .badgeReal {
-  background: var(--cool-white);
-  color: var(--ink-soft);
+  background: var(--surface-2);
+  color: var(--text-muted);
 }
 
 a.badge:hover {
@@ -246,22 +246,22 @@ a.badge:hover {
 .statusSelect {
   height: 34px;
   padding: 0 8px;
-  border: 1px solid var(--mist);
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   background: var(--surface);
-  color: var(--ink);
+  color: var(--text);
   font: inherit;
   font-size: 14px;
   cursor: pointer;
 }
 
 .statusSelect[data-status="FECHOU"] {
-  border-color: var(--signal);
-  color: #b33a0c;
+  border-color: var(--accent);
+  color: var(--accent-text);
 }
 
 .statusSelect[data-status="DESCARTADO"] {
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 .statusSelect:disabled {
@@ -271,7 +271,7 @@ a.badge:hover {
 
 .mapsLink {
   font-size: 13px;
-  color: var(--cobalt);
+  color: var(--primary-text);
   white-space: nowrap;
   text-decoration: none;
 }
@@ -284,17 +284,17 @@ a.badge:hover {
 .message {
   margin: 0;
   padding: 28px;
-  border-radius: var(--radius);
+  border-radius: var(--r-lg);
   background: var(--surface);
-  border: 1px dashed var(--mist);
-  color: var(--ink-soft);
+  border: 1px dashed var(--border-strong);
+  color: var(--text-muted);
   text-align: center;
 }
 
 .skeleton {
   height: 320px;
-  border-radius: var(--radius);
-  background: rgb(201 206 230 / 0.4);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--mist-base) 40%, transparent);
 }
 
 /* ---------- paginação ---------- */
@@ -303,17 +303,17 @@ a.badge:hover {
   justify-content: center;
   align-items: center;
   gap: 16px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
   font-size: 14px;
 }
 
 .pageButton {
   height: 38px;
   padding: 0 14px;
-  border: 1px solid var(--mist);
+  border: 1px solid var(--border-strong);
   border-radius: 999px;
   background: var(--surface);
-  color: var(--ink);
+  color: var(--text);
   cursor: pointer;
 }
 
@@ -335,12 +335,12 @@ a.badge:hover {
 .table th input[type="checkbox"] {
   width: 17px;
   height: 17px;
-  accent-color: var(--cobalt);
+  accent-color: var(--primary);
   cursor: pointer;
 }
 
 .rowSelected td {
-  background: rgb(36 51 255 / 0.04);
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
 }
 
 /* ---------- score ---------- */
@@ -357,18 +357,18 @@ a.badge:hover {
 }
 
 .score[data-level="hot"] {
-  background: var(--signal);
-  color: #fff;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .score[data-level="warm"] {
-  background: rgb(36 51 255 / 0.1);
-  color: var(--cobalt);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary-text);
 }
 
 .score[data-level="cold"] {
-  background: var(--cool-white);
-  color: var(--ink-faint);
+  background: var(--surface-2);
+  color: var(--text-faint);
 }
 
 /* ---------- ações da linha ---------- */
@@ -382,10 +382,10 @@ a.badge:hover {
 .qualifyButton {
   height: 34px;
   padding: 0 14px;
-  border: 1px solid var(--cobalt);
+  border: 1px solid var(--primary);
   border-radius: 999px;
   background: var(--surface);
-  color: var(--cobalt);
+  color: var(--primary-text);
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
@@ -394,8 +394,8 @@ a.badge:hover {
 }
 
 .qualifyButton:hover:not(:disabled) {
-  background: var(--cobalt);
-  color: #fff;
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .qualifyButton:disabled {
@@ -406,20 +406,20 @@ a.badge:hover {
 .expandButton {
   width: 34px;
   height: 34px;
-  border: 1px solid var(--mist);
+  border: 1px solid var(--border-strong);
   border-radius: 999px;
   background: var(--surface);
-  color: var(--ink-soft);
+  color: var(--text-muted);
   cursor: pointer;
 }
 
 .expandButton[aria-expanded="true"] {
-  background: var(--cool-white);
+  background: var(--surface-2);
 }
 
 /* ---------- linha de detalhes ---------- */
 .detailsRow td {
-  background: var(--cool-white);
+  background: var(--surface-2);
   padding: 20px 24px !important;
 }
 
@@ -444,7 +444,7 @@ a.badge:hover {
 
 .detailsText {
   margin: 6px 0 0;
-  color: var(--ink);
+  color: var(--text);
   line-height: 1.5;
 }
 
@@ -452,7 +452,7 @@ a.badge:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -462,16 +462,16 @@ a.badge:hover {
   padding: 14px 16px;
   border-radius: 14px 14px 14px 4px;
   background: var(--surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   white-space: pre-wrap;
   line-height: 1.5;
-  color: var(--ink);
+  color: var(--text);
 }
 
 .errorRow td {
   padding: 8px 16px 12px !important;
-  background: rgb(255 90 31 / 0.08);
-  color: #b33a0c;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent-text);
   font-size: 13px;
 }
 
@@ -487,12 +487,12 @@ a.badge:hover {
   gap: 12px;
   padding: 10px 10px 10px 18px;
   border-radius: 999px;
-  background: var(--ink);
-  color: #fff;
+  background: var(--text);
+  color: var(--surface);
 }
 
 .bulkBar .linkButton {
-  color: var(--mist);
+  color: var(--border-strong);
 }
 
 .bulkActions {
@@ -507,27 +507,27 @@ a.badge:hover {
 }
 
 .bulkWarn {
-  color: var(--signal);
+  color: var(--accent-text);
 }
 
 .batchResult {
   margin: 0;
   padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  background: rgb(36 51 255 / 0.06);
-  color: var(--ink);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  color: var(--text);
   font-size: 14px;
 }
 
 .aiUsage {
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 .warning {
   margin: 0;
   padding: 12px 14px;
-  border-radius: var(--radius-sm);
-  background: rgb(36 51 255 / 0.06);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
   font-size: 14px;
 }
 
@@ -539,10 +539,10 @@ a.badge:hover {
 .contactButton {
   height: 34px;
   padding: 0 14px;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--text);
   border-radius: 999px;
-  background: var(--ink);
-  color: #fff;
+  background: var(--text);
+  color: var(--surface);
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
@@ -556,16 +556,71 @@ a.badge:hover {
 
 .contactButton[aria-expanded="true"] {
   background: var(--surface);
-  color: var(--ink);
+  color: var(--text);
 }
 
 .contactButton:focus-visible {
-  outline: 2px solid var(--cobalt);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
 .detailsSub {
   margin: 2px 0 0;
   font-size: 13px;
-  color: var(--ink-faint);
+  color: var(--text-faint);
+}
+
+/* =========================================================
+   Redesign: busca com ícone, cabeçalhos legíveis, botões com ícone
+   ========================================================= */
+
+.searchWrap {
+  position: relative;
+  display: block;
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
+.searchInput {
+  padding-left: 36px;
+}
+
+/* Cabeçalho da tabela em texto normal (a fonte pixelada cansava a leitura) */
+.table th {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+
+.qualifyButton,
+.contactButton,
+.mapsLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.contactButton,
+.qualifyButton {
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.contactButton:active,
+.qualifyButton:active:not(:disabled) {
+  transform: scale(0.97);
 }

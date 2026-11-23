@@ -22,7 +22,7 @@ export function NotesEditor({ lead }: { lead: Lead }) {
   return (
     <div className={styles.notes}>
       <label className={styles.label} htmlFor={`notes-${lead.id}`}>
-        <span className="tag">Notas</span>
+        <span className="label">Notas</span>
       </label>
       <textarea
         id={`notes-${lead.id}`}

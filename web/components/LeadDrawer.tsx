@@ -1,5 +1,6 @@
 "use client";
 
+import { MapPin, X } from "@phosphor-icons/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { apiGet } from "@/lib/api";
@@ -61,13 +62,12 @@ export function LeadDrawer({ leadId, onClose }: Props) {
       <div className={styles.panel}>
         <header className={styles.header}>
           <div className={styles.titleBlock}>
-            <span className="tag tag--cobalt">Lead</span>
             <h2 id="drawer-title" className={styles.title}>
               {lead?.name ?? "Carregando…"}
             </h2>
           </div>
           <button type="button" className={styles.close} onClick={onClose} aria-label="Fechar painel">
-            ✕
+            <X size={18} aria-hidden />
           </button>
         </header>
 
@@ -89,7 +89,7 @@ export function LeadDrawer({ leadId, onClose }: Props) {
             </div>
 
             <label className={styles.statusField}>
-              <span className="tag">Status</span>
+              <span className="label">Status</span>
               <select
                 className={styles.statusSelect}
                 value={lead.status}
@@ -109,7 +109,7 @@ export function LeadDrawer({ leadId, onClose }: Props) {
               {lead.address && <span className={styles.muted}>{lead.address}</span>}
               {lead.mapsUrl && (
                 <a href={lead.mapsUrl} target="_blank" rel="noreferrer" className={styles.link}>
-                  Ver no Maps ↗
+                  <MapPin size={14} aria-hidden /> Ver no Maps
                 </a>
               )}
             </div>

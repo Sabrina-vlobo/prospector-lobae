@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useState, type FormEvent } from "react";
 import { apiGet, apiPost } from "@/lib/api";
 import type { SearchInput, SearchSummary, Usage } from "@/lib/types";
@@ -54,7 +55,6 @@ export function SearchForm() {
   return (
     <section className={styles.card} aria-labelledby="search-title">
       <div className={styles.head}>
-        <span className="tag tag--cobalt">Nova busca</span>
         <h2 id="search-title" className={styles.title}>
           Encontrar negócios no Google
         </h2>
@@ -62,7 +62,7 @@ export function SearchForm() {
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <label className={styles.field}>
-          <span className="tag">Segmento</span>
+          <span className="label">Segmento</span>
           <input
             className={styles.input}
             value={segment}
@@ -75,7 +75,7 @@ export function SearchForm() {
         </label>
 
         <label className={styles.field}>
-          <span className="tag">Cidade</span>
+          <span className="label">Cidade</span>
           <input
             className={styles.input}
             value={city}
@@ -88,7 +88,7 @@ export function SearchForm() {
         </label>
 
         <label className={styles.field}>
-          <span className="tag">Até quantos negócios</span>
+          <span className="label">Até quantos negócios</span>
           <select
             className={styles.input}
             value={pages}
@@ -103,6 +103,7 @@ export function SearchForm() {
         </label>
 
         <button className={`btn ${styles.submit}`} type="submit" disabled={disabled}>
+          <MagnifyingGlass size={16} weight="bold" aria-hidden />
           {search.isPending ? "Buscando…" : "Buscar"}
         </button>
 
@@ -121,7 +122,7 @@ export function SearchForm() {
       {google && (
         <div className={styles.usage}>
           <div className={styles.usageText}>
-            <span className="tag">Google este mês</span>
+            <span className="label">Google este mês</span>
             <span>
               <strong>{google.used}</strong> de {google.limit} chamadas
             </span>
